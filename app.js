@@ -39,6 +39,11 @@ function initGraph() {
     
     // Graph starten
     graph.start();
+    
+    // Kontinuierliche Aktualisierung aktivieren (unabhängig von Mausbewegung)
+    graph.onBeforeStep = function() {
+        graph.setDirtyCanvas(true);
+    };
 }
 
 // Event-Listener einrichten
@@ -346,7 +351,8 @@ function flashToolbarButton(buttonId) {
 
 // Eigenschaften eines Knotens anzeigen
 function showNodeProperties(node) {
-    const propertiesPanel = document.getElementById("node-properties");
+    // Verwende das vorgesehene Panel am rechten Rand
+    const propertiesPanel = document.getElementById("properties-panel") || document.getElementById("node-properties");
     
     if (!node) {
         propertiesPanel.innerHTML = `
@@ -637,6 +643,9 @@ function startSimulation() {
         // Erstelle einen Timer, der alle 100ms die Graphberechnung ausführt
         simulationInterval = setInterval(function() {
             graph.runStep();
+            
+            // Erzwinge Neuzeichnen des Canvas
+            graph.setDirtyCanvas(true);
             
             // Aktualisiere die Anzeige der Simulationszeit
             updateSimulationTime();
