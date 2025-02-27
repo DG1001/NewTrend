@@ -90,11 +90,14 @@ function registerCustomNodes() {
         }
         
         onExecute() {
-            let value;
-            if (this.properties.type === "custom" || this.properties.useCustomRange) {
-                value = simulateSensorData.custom(this.properties.min, this.properties.max);
-            } else {
-                value = simulateSensorData[this.properties.type]();
+            let value = 0;
+            // Nur neue Werte generieren, wenn die Simulation läuft
+            if (simulationRunning) {
+                if (this.properties.type === "custom" || this.properties.useCustomRange) {
+                    value = simulateSensorData.custom(this.properties.min, this.properties.max);
+                } else {
+                    value = simulateSensorData[this.properties.type]();
+                }
             }
             this.setOutputData(0, value);
         }
@@ -122,8 +125,11 @@ function registerCustomNodes() {
             const value = this.getInputData(0);
             if (value !== undefined) {
                 this.currentValue = value;
-                this.values.push(value);
-                this.values.shift();
+                // Nur den Graphen aktualisieren, wenn die Simulation läuft
+                if (simulationRunning) {
+                    this.values.push(value);
+                    this.values.shift();
+                }
             }
         }
         
@@ -186,34 +192,37 @@ function registerCustomNodes() {
             const b = this.getInputData(1) || 0;
             let result = 0;
             
-            if (this.properties.useCustomFormula && this.properties.customFormula) {
-                try {
-                    // Create a safe evaluation context with only the inputs
-                    const evalFn = new Function('a', 'b', 'return ' + this.properties.customFormula);
-                    result = evalFn(a, b);
-                    
-                    // Check if result is valid
-                    if (isNaN(result) || !isFinite(result)) {
+            // Nur berechnen, wenn die Simulation läuft
+            if (simulationRunning) {
+                if (this.properties.useCustomFormula && this.properties.customFormula) {
+                    try {
+                        // Create a safe evaluation context with only the inputs
+                        const evalFn = new Function('a', 'b', 'return ' + this.properties.customFormula);
+                        result = evalFn(a, b);
+                        
+                        // Check if result is valid
+                        if (isNaN(result) || !isFinite(result)) {
+                            result = 0;
+                        }
+                    } catch (error) {
+                        console.error("Formula error:", error);
                         result = 0;
                     }
-                } catch (error) {
-                    console.error("Formula error:", error);
-                    result = 0;
-                }
-            } else {
-                switch(this.properties.operation) {
-                    case "add":
-                        result = a + b;
-                        break;
-                    case "subtract":
-                        result = a - b;
-                        break;
-                    case "multiply":
-                        result = a * b;
-                        break;
-                    case "divide":
-                        result = b !== 0 ? a / b : 0;
-                        break;
+                } else {
+                    switch(this.properties.operation) {
+                        case "add":
+                            result = a + b;
+                            break;
+                        case "subtract":
+                            result = a - b;
+                            break;
+                        case "multiply":
+                            result = a * b;
+                            break;
+                        case "divide":
+                            result = b !== 0 ? a / b : 0;
+                            break;
+                    }
                 }
             }
             
@@ -265,10 +274,13 @@ function registerCustomNodes() {
         onExecute() {
             const value = this.getInputData(0);
             if (value !== undefined) {
-                if (this.properties.condition === "greater") {
-                    this.alarm = value > this.properties.threshold;
-                } else {
-                    this.alarm = value < this.properties.threshold;
+                // Nur Alarm-Status aktualisieren, wenn die Simulation läuft
+                if (simulationRunning) {
+                    if (this.properties.condition === "greater") {
+                        this.alarm = value > this.properties.threshold;
+                    } else {
+                        this.alarm = value < this.properties.threshold;
+                    }
                 }
                 this.setOutputData(0, this.alarm);
             }
