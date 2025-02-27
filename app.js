@@ -3,6 +3,7 @@ let graph = null;
 let canvas = null;
 let simulationInterval = null;
 let simulationRunning = false;
+let simulationStartTime = null;
 
 // Sensor-Daten simulieren
 const simulateSensorData = {
@@ -623,12 +624,24 @@ function showNodeProperties(node) {
     });
 }
 
-// Simulation starten
+/**
+ * Startet die Simulation der Sensordaten
+ * 
+ * Diese Funktion:
+ * 1. Erstellt einen Timer, der regelmäßig graph.runStep() aufruft
+ * 2. Aktualisiert die UI, um den aktiven Zustand anzuzeigen
+ * 3. Generiert Sensordaten basierend auf den Konfigurationen der Sensorknoten
+ */
 function startSimulation() {
     if (!simulationRunning) {
+        // Erstelle einen Timer, der alle 100ms die Graphberechnung ausführt
         simulationInterval = setInterval(function() {
             graph.runStep();
+            
+            // Aktualisiere die Anzeige der Simulationszeit
+            updateSimulationTime();
         }, 100);
+        
         simulationRunning = true;
         
         // UI-Feedback
@@ -641,12 +654,24 @@ function startSimulation() {
         
         // Visuelles Feedback
         flashToolbarButton("start-sim");
+        
+        // Zeige Simulationsinfo an
+        showSimulationInfo(true);
+        
+        console.log("Simulation gestartet - Sensordaten werden generiert");
     }
 }
 
-// Simulation stoppen
+/**
+ * Stoppt die laufende Simulation
+ * 
+ * Diese Funktion:
+ * 1. Beendet den Timer für die Datengenerierung
+ * 2. Aktualisiert die UI, um den inaktiven Zustand anzuzeigen
+ */
 function stopSimulation() {
     if (simulationRunning) {
+        // Beende den Timer
         clearInterval(simulationInterval);
         simulationRunning = false;
         
@@ -660,5 +685,69 @@ function stopSimulation() {
         
         // Visuelles Feedback
         flashToolbarButton("stop-sim");
+        
+        // Verstecke Simulationsinfo
+        showSimulationInfo(false);
+        
+        console.log("Simulation gestoppt");
+    }
+}
+
+/**
+ * Zeigt oder versteckt die Simulationsinformationen
+ */
+function showSimulationInfo(show) {
+    // Erstelle das Simulationsinfo-Element, falls es noch nicht existiert
+    let simInfo = document.getElementById("simulation-info");
+    
+    if (!simInfo) {
+        simInfo = document.createElement("div");
+        simInfo.id = "simulation-info";
+        simInfo.className = "simulation-info";
+        
+        // Füge Inhalt hinzu
+        simInfo.innerHTML = `
+            <div class="sim-status">
+                <i class="fas fa-cog fa-spin"></i>
+                <span>Simulation aktiv</span>
+            </div>
+            <div class="sim-time">
+                Laufzeit: <span id="sim-time-value">00:00:00</span>
+            </div>
+        `;
+        
+        // Füge es zum DOM hinzu
+        document.getElementById("canvas-container").appendChild(simInfo);
+    }
+    
+    // Zeige oder verstecke es
+    simInfo.style.display = show ? "block" : "none";
+    
+    // Setze die Startzeit zurück, wenn die Simulation gestartet wird
+    if (show) {
+        simulationStartTime = new Date();
+    }
+}
+
+/**
+ * Aktualisiert die angezeigte Simulationszeit
+ */
+function updateSimulationTime() {
+    if (!simulationRunning || !simulationStartTime) return;
+    
+    const now = new Date();
+    const diff = now - simulationStartTime;
+    
+    // Formatiere die Zeit als HH:MM:SS
+    const hours = Math.floor(diff / 3600000).toString().padStart(2, '0');
+    const minutes = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+    const seconds = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+    
+    const timeString = `${hours}:${minutes}:${seconds}`;
+    
+    // Aktualisiere die Anzeige
+    const timeElement = document.getElementById("sim-time-value");
+    if (timeElement) {
+        timeElement.textContent = timeString;
     }
 }

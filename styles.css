@@ -66,6 +66,7 @@ main {
     background-color: #ffffff;
     border: 1px solid #ddd;
     overflow: hidden;
+    position: relative;
 }
 
 #graph-canvas {
@@ -221,6 +222,41 @@ footer {
     text-align: center;
     font-size: 14px;
     box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+}
+
+/* Simulation Info Styling */
+.simulation-info {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-size: 14px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    display: none;
+}
+
+.sim-status {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.sim-status i {
+    color: #27AE60;
+    margin-right: 8px;
+}
+
+.sim-time {
+    font-family: 'Consolas', monospace;
+}
+
+#sim-time-value {
+    font-weight: bold;
+    color: #3498DB;
 }
 
 /* Anpassungen für litegraph.js */
