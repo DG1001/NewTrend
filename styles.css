@@ -70,6 +70,21 @@ main {
     color: #005b9f;
 }
 
+#properties-panel small {
+    display: block;
+    color: #666;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+#properties-panel input[type="text"],
+#properties-panel input[type="number"],
+#properties-panel select {
+    width: 100%;
+    padding: 5px;
+    margin-top: 3px;
+}
+
 footer {
     background-color: #005b9f;
     color: white;

@@ -9,7 +9,8 @@ const simulateSensorData = {
     temperature: () => 20 + Math.random() * 10,
     humidity: () => 40 + Math.random() * 30,
     pressure: () => 1000 + Math.random() * 20,
-    flow: () => Math.random() * 100
+    flow: () => Math.random() * 100,
+    custom: (min, max) => min + Math.random() * (max - min)
 };
 
 // Beim Laden der Seite initialisieren
@@ -75,14 +76,20 @@ function registerCustomNodes() {
                 min: 0, 
                 max: 100,
                 unit: "°C",
-                name: "Sensor 1"
+                name: "Sensor 1",
+                useCustomRange: false
             };
             this.size = [180, 60];
             this.color = "#2E86C1";
         }
         
         onExecute() {
-            const value = simulateSensorData[this.properties.type]();
+            let value;
+            if (this.properties.type === "custom" || this.properties.useCustomRange) {
+                value = simulateSensorData.custom(this.properties.min, this.properties.max);
+            } else {
+                value = simulateSensorData[this.properties.type]();
+            }
             this.setOutputData(0, value);
         }
     }
@@ -160,6 +167,8 @@ function registerCustomNodes() {
             this.addOutput("Ergebnis", "number");
             this.properties = { 
                 operation: "add", // add, subtract, multiply, divide
+                customFormula: "",
+                useCustomFormula: false,
                 name: "Formel 1"
             };
             this.size = [180, 90];
@@ -171,19 +180,35 @@ function registerCustomNodes() {
             const b = this.getInputData(1) || 0;
             let result = 0;
             
-            switch(this.properties.operation) {
-                case "add":
-                    result = a + b;
-                    break;
-                case "subtract":
-                    result = a - b;
-                    break;
-                case "multiply":
-                    result = a * b;
-                    break;
-                case "divide":
-                    result = b !== 0 ? a / b : 0;
-                    break;
+            if (this.properties.useCustomFormula && this.properties.customFormula) {
+                try {
+                    // Create a safe evaluation context with only the inputs
+                    const evalFn = new Function('a', 'b', 'return ' + this.properties.customFormula);
+                    result = evalFn(a, b);
+                    
+                    // Check if result is valid
+                    if (isNaN(result) || !isFinite(result)) {
+                        result = 0;
+                    }
+                } catch (error) {
+                    console.error("Formula error:", error);
+                    result = 0;
+                }
+            } else {
+                switch(this.properties.operation) {
+                    case "add":
+                        result = a + b;
+                        break;
+                    case "subtract":
+                        result = a - b;
+                        break;
+                    case "multiply":
+                        result = a * b;
+                        break;
+                    case "divide":
+                        result = b !== 0 ? a / b : 0;
+                        break;
+                }
             }
             
             this.setOutputData(0, result);
@@ -194,14 +219,22 @@ function registerCustomNodes() {
             ctx.fillStyle = "#000";
             ctx.textAlign = "center";
             
-            let symbol = "+";
-            switch(this.properties.operation) {
-                case "subtract": symbol = "-"; break;
-                case "multiply": symbol = "×"; break;
-                case "divide": symbol = "÷"; break;
+            if (this.properties.useCustomFormula && this.properties.customFormula) {
+                // Show a small preview of the custom formula
+                const formula = this.properties.customFormula.length > 10 ? 
+                    this.properties.customFormula.substring(0, 10) + "..." : 
+                    this.properties.customFormula;
+                ctx.fillText(formula, this.size[0] * 0.5, 55);
+            } else {
+                let symbol = "+";
+                switch(this.properties.operation) {
+                    case "subtract": symbol = "-"; break;
+                    case "multiply": symbol = "×"; break;
+                    case "divide": symbol = "÷"; break;
+                }
+                
+                ctx.fillText(symbol, this.size[0] * 0.5, 55);
             }
-            
-            ctx.fillText(symbol, this.size[0] * 0.5, 55);
         }
     }
     LiteGraph.registerNodeType("trendows/formula", FormulaNode);
@@ -295,11 +328,24 @@ function showNodeProperties(node) {
                     <option value="humidity" ${node.properties.type === "humidity" ? "selected" : ""}>Luftfeuchtigkeit</option>
                     <option value="pressure" ${node.properties.type === "pressure" ? "selected" : ""}>Druck</option>
                     <option value="flow" ${node.properties.type === "flow" ? "selected" : ""}>Durchfluss</option>
+                    <option value="custom" ${node.properties.type === "custom" ? "selected" : ""}>Benutzerdefiniert</option>
                 </select>
             </div>
             <div class="property">
                 <label>Einheit:</label>
                 <input type="text" id="prop-unit" value="${node.properties.unit}">
+            </div>
+            <div class="property">
+                <label>Benutzerdefinierter Bereich:</label>
+                <input type="checkbox" id="prop-useCustomRange" ${node.properties.useCustomRange ? "checked" : ""}>
+            </div>
+            <div class="property">
+                <label>Min:</label>
+                <input type="number" id="prop-min" value="${node.properties.min}">
+            </div>
+            <div class="property">
+                <label>Max:</label>
+                <input type="number" id="prop-max" value="${node.properties.max}">
             </div>
         `;
     } else if (node.constructor.name === "DisplayNode") {
@@ -316,6 +362,10 @@ function showNodeProperties(node) {
     } else if (node.constructor.name === "FormulaNode") {
         html += `
             <div class="property">
+                <label>Benutzerdefinierte Formel:</label>
+                <input type="checkbox" id="prop-useCustomFormula" ${node.properties.useCustomFormula ? "checked" : ""}>
+            </div>
+            <div class="property" id="standard-operations" ${node.properties.useCustomFormula ? 'style="display:none;"' : ''}>
                 <label>Operation:</label>
                 <select id="prop-operation">
                     <option value="add" ${node.properties.operation === "add" ? "selected" : ""}>Addition (+)</option>
@@ -324,7 +374,31 @@ function showNodeProperties(node) {
                     <option value="divide" ${node.properties.operation === "divide" ? "selected" : ""}>Division (÷)</option>
                 </select>
             </div>
+            <div class="property" id="custom-formula" ${!node.properties.useCustomFormula ? 'style="display:none;"' : ''}>
+                <label>Formel (verwende a und b als Variablen):</label>
+                <input type="text" id="prop-customFormula" value="${node.properties.customFormula || ''}" placeholder="z.B.: a * b + 10">
+                <small>Beispiele: a + b, a * b, Math.sin(a), a > b ? a : b</small>
+            </div>
         `;
+
+        // Add script to toggle between standard operations and custom formula
+        setTimeout(() => {
+            const useCustomFormulaCheckbox = document.getElementById("prop-useCustomFormula");
+            const standardOperations = document.getElementById("standard-operations");
+            const customFormula = document.getElementById("custom-formula");
+            
+            if (useCustomFormulaCheckbox) {
+                useCustomFormulaCheckbox.addEventListener("change", function() {
+                    if (this.checked) {
+                        standardOperations.style.display = "none";
+                        customFormula.style.display = "block";
+                    } else {
+                        standardOperations.style.display = "block";
+                        customFormula.style.display = "none";
+                    }
+                });
+            }
+        }, 100);
     } else if (node.constructor.name === "AlarmNode") {
         html += `
             <div class="property">
@@ -354,11 +428,19 @@ function showNodeProperties(node) {
         if (node.constructor.name === "SensorNode") {
             node.properties.type = document.getElementById("prop-type").value;
             node.properties.unit = document.getElementById("prop-unit").value;
+            node.properties.useCustomRange = document.getElementById("prop-useCustomRange").checked;
+            node.properties.min = parseFloat(document.getElementById("prop-min").value);
+            node.properties.max = parseFloat(document.getElementById("prop-max").value);
         } else if (node.constructor.name === "DisplayNode") {
             node.properties.precision = parseInt(document.getElementById("prop-precision").value);
             node.properties.showGraph = document.getElementById("prop-showGraph").checked;
         } else if (node.constructor.name === "FormulaNode") {
-            node.properties.operation = document.getElementById("prop-operation").value;
+            node.properties.useCustomFormula = document.getElementById("prop-useCustomFormula").checked;
+            if (node.properties.useCustomFormula) {
+                node.properties.customFormula = document.getElementById("prop-customFormula").value;
+            } else {
+                node.properties.operation = document.getElementById("prop-operation").value;
+            }
         } else if (node.constructor.name === "AlarmNode") {
             node.properties.threshold = parseFloat(document.getElementById("prop-threshold").value);
             node.properties.condition = document.getElementById("prop-condition").value;
