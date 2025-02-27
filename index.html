@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trendows Web Prototyp</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/litegraph.js@0.7.14/build/litegraph.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Trendows Web Prototyp</h1>
+        <div class="toolbar">
+            <button id="add-sensor">Sensor hinzufügen</button>
+            <button id="add-display">Anzeige hinzufügen</button>
+            <button id="add-formula">Formel hinzufügen</button>
+            <button id="add-alarm">Alarm hinzufügen</button>
+            <button id="start-sim">Simulation starten</button>
+            <button id="stop-sim">Simulation stoppen</button>
+        </div>
+    </header>
+    
+    <main>
+        <div id="canvas-container">
+            <canvas id="graph-canvas"></canvas>
+        </div>
+        
+        <div id="properties-panel">
+            <h3>Eigenschaften</h3>
+            <div id="node-properties">
+                <p>Wählen Sie ein Element aus, um dessen Eigenschaften zu bearbeiten.</p>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <p>Trendows Web Prototyp - Kirsten Controls</p>
+    </footer>
+    
+    <script src="app.js"></script>
+</body>
+</html>
