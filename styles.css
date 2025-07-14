@@ -41,8 +41,9 @@ header h1 {
 /* Add visual separators between groups */
 .toolbar button:nth-child(3)::after,    /* After Konstante */
 .toolbar button:nth-child(6)::after,    /* After Formel */
-.toolbar button:nth-child(11)::after,   /* After Zähler */
-.toolbar button:nth-child(14)::after {  /* After Alarm */
+.toolbar button:nth-child(9)::after,    /* After LED */
+.toolbar button:nth-child(14)::after,   /* After Zähler */
+.toolbar button:nth-child(17)::after {  /* After Alarm */
     content: "|";
     color: rgba(255, 255, 255, 0.3);
     margin-left: 12px;
@@ -240,6 +241,21 @@ main {
 
 .pid-properties {
     border-left: 4px solid #2C3E50;
+    padding-left: 12px;
+}
+
+.gauge-properties {
+    border-left: 4px solid #3498DB;
+    padding-left: 12px;
+}
+
+.chart-properties {
+    border-left: 4px solid #9B59B6;
+    padding-left: 12px;
+}
+
+.led-properties {
+    border-left: 4px solid #34495E;
     padding-left: 12px;
 }
 
