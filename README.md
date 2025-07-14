@@ -89,11 +89,18 @@ A web-based visual node editor for creating sensor monitoring and data processin
 ## Project Structure
 
 ```
-├── index.html      # Main application layout
-├── app.js          # Core logic and node implementations
-├── styles.css      # Complete styling and visual design
-├── CLAUDE.md       # Development guidance
-└── README.md       # This file
+├── index.html          # Main application layout
+├── app.js              # Core application logic (monolithic bundle)
+├── app-minimal.js      # Minimal build without legacy support
+├── app-legacy.js       # Legacy browser support build
+├── js/                 # Modular application source code
+│   ├── core            # Core engine and application modules
+│   ├── nodes           # Node type definitions
+│   ├── utils           # Utility modules
+│   └── main.js         # Application entry point for modular code
+├── styles.css          # Complete styling and visual design
+├── CLAUDE.md           # AI development guidance
+└── README.md           # This file
 ```
 
 ## Technology Stack
