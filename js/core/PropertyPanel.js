@@ -109,6 +109,20 @@ const PropertyPanel = {
                 return this.generateTimerProperties(node);
             case 'CounterNode':
                 return this.generateCounterProperties(node);
+            case 'ChartNode':
+                return this.generateChartProperties(node);
+            case 'LedIndicatorNode':
+                return this.generateLedProperties(node);
+            case 'StatisticsNode':
+                return this.generateStatisticsProperties(node);
+            case 'PidControllerNode':
+                return this.generatePidProperties(node);
+            case 'AndGateNode':
+                return this.generateLogicGateProperties(node);
+            case 'OrGateNode':
+                return this.generateLogicGateProperties(node);
+            case 'NotGateNode':
+                return this.generateLogicGateProperties(node);
             default:
                 return '<div class="property"><p>No specific properties available for this node type.</p></div>';
         }
@@ -224,6 +238,14 @@ const PropertyPanel = {
                 this.updateNodeProperties(node);
             });
         }
+        
+        // Setup PID Reset button if present
+        const resetPidButton = document.getElementById("reset-pid");
+        if (resetPidButton) {
+            resetPidButton.addEventListener("click", () => {
+                this.resetPidController(node);
+            });
+        }
     },
     
     // Update node properties from form values
@@ -267,6 +289,23 @@ const PropertyPanel = {
                 break;
             case 'CounterNode':
                 this.updateCounterProperties(node);
+                break;
+            case 'ChartNode':
+                this.updateChartProperties(node);
+                break;
+            case 'LedIndicatorNode':
+                this.updateLedProperties(node);
+                break;
+            case 'StatisticsNode':
+                this.updateStatisticsProperties(node);
+                break;
+            case 'PidControllerNode':
+                this.updatePidProperties(node);
+                break;
+            case 'AndGateNode':
+            case 'OrGateNode':
+            case 'NotGateNode':
+                this.updateLogicGateProperties(node);
                 break;
         }
         
@@ -503,6 +542,205 @@ const PropertyPanel = {
                 </div>
             </div>
         `;
+    },
+    
+    // Chart node properties
+    generateChartProperties(node) {
+        return `
+            <div class="property">
+                <label>Time Window (seconds):</label>
+                <input type="number" id="prop-timeWindow" value="${node.properties.timeWindow}" min="5" max="300">
+            </div>
+            <div class="property">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="prop-autoScale" ${node.properties.autoScale ? "checked" : ""}>
+                    <label for="prop-autoScale" style="display: inline; font-weight: normal;">Auto Scale Y-Axis</label>
+                </div>
+            </div>
+            <div class="property">
+                <label>Y-Axis Range (if not auto-scale):</label>
+                <div style="display: flex; gap: 10px;">
+                    <div style="flex: 1;">
+                        <label>Min Y:</label>
+                        <input type="number" id="prop-minY" value="${node.properties.minY}">
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Max Y:</label>
+                        <input type="number" id="prop-maxY" value="${node.properties.maxY}">
+                    </div>
+                </div>
+            </div>
+            <div class="property">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="prop-showGrid" ${node.properties.showGrid ? "checked" : ""}>
+                    <label for="prop-showGrid" style="display: inline; font-weight: normal;">Show Grid</label>
+                </div>
+            </div>
+        `;
+    },
+    
+    // LED Indicator properties
+    generateLedProperties(node) {
+        return `
+            <div class="property">
+                <label>LED Size:</label>
+                <select id="prop-ledSize">
+                    <option value="small" ${node.properties.ledSize === "small" ? "selected" : ""}>Small</option>
+                    <option value="medium" ${node.properties.ledSize === "medium" ? "selected" : ""}>Medium</option>
+                    <option value="large" ${node.properties.ledSize === "large" ? "selected" : ""}>Large</option>
+                </select>
+            </div>
+            <div class="property">
+                <label>LED States:</label>
+                <small>Configure the different LED states. Current states:</small>
+                <div id="led-states-display" style="margin-top: 10px;">
+                    ${node.properties.states.map((state, index) => `
+                        <div style="display: flex; align-items: center; margin-bottom: 5px; padding: 5px; border: 1px solid #ddd; border-radius: 3px;">
+                            <div style="width: 16px; height: 16px; border-radius: 50%; background-color: ${state.color}; margin-right: 8px;"></div>
+                            <span style="flex: 1;">${state.label} (${state.value})</span>
+                            <span style="font-size: 10px; color: #666;">${state.blink ? "Blinking" : "Solid"}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <small style="color: #666; margin-top: 5px; display: block;">Note: LED states can be configured by selecting individual states in the advanced properties (future feature).</small>
+            </div>
+        `;
+    },
+    
+    // Statistics node properties
+    generateStatisticsProperties(node) {
+        return `
+            <div class="property">
+                <label>Window Size:</label>
+                <input type="number" id="prop-windowSize" value="${node.properties.windowSize}" min="1" max="100">
+                <small>Number of data points to analyze</small>
+            </div>
+            <div class="property">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="prop-resetOnStart" ${node.properties.resetOnStart ? "checked" : ""}>
+                    <label for="prop-resetOnStart" style="display: inline; font-weight: normal;">Reset on Simulation Start</label>
+                </div>
+            </div>
+        `;
+    },
+    
+    // PID Controller properties
+    generatePidProperties(node) {
+        return `
+            <div class="property">
+                <label>Proportional (Kp):</label>
+                <input type="number" id="prop-kp" value="${node.properties.kp}" min="0" max="100" step="0.1">
+            </div>
+            <div class="property">
+                <label>Integral (Ki):</label>
+                <input type="number" id="prop-ki" value="${node.properties.ki}" min="0" max="10" step="0.01">
+            </div>
+            <div class="property">
+                <label>Derivative (Kd):</label>
+                <input type="number" id="prop-kd" value="${node.properties.kd}" min="0" max="1" step="0.001">
+            </div>
+            <div class="property">
+                <label>Output Limits:</label>
+                <div style="display: flex; gap: 10px;">
+                    <div style="flex: 1;">
+                        <label>Min:</label>
+                        <input type="number" id="prop-outputMin" value="${node.properties.outputMin}">
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Max:</label>
+                        <input type="number" id="prop-outputMax" value="${node.properties.outputMax}">
+                    </div>
+                </div>
+            </div>
+            <div class="property">
+                <button id="reset-pid" type="button" style="width: 100%; padding: 8px; background-color: #E67E22; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    <i class="fas fa-undo"></i> Reset PID
+                </button>
+            </div>
+        `;
+    },
+    
+    // Update chart node properties
+    updateChartProperties(node) {
+        const timeWindowField = document.getElementById("prop-timeWindow");
+        const autoScaleField = document.getElementById("prop-autoScale");
+        const minYField = document.getElementById("prop-minY");
+        const maxYField = document.getElementById("prop-maxY");
+        const showGridField = document.getElementById("prop-showGrid");
+        
+        if (timeWindowField) node.properties.timeWindow = parseInt(timeWindowField.value);
+        if (autoScaleField) node.properties.autoScale = autoScaleField.checked;
+        if (minYField) node.properties.minY = parseFloat(minYField.value);
+        if (maxYField) node.properties.maxY = parseFloat(maxYField.value);
+        if (showGridField) node.properties.showGrid = showGridField.checked;
+    },
+    
+    // Update LED properties
+    updateLedProperties(node) {
+        const ledSizeField = document.getElementById("prop-ledSize");
+        if (ledSizeField) node.properties.ledSize = ledSizeField.value;
+        // Note: State configuration is more complex and would need a dedicated UI
+    },
+    
+    // Update statistics properties
+    updateStatisticsProperties(node) {
+        const windowSizeField = document.getElementById("prop-windowSize");
+        const resetOnStartField = document.getElementById("prop-resetOnStart");
+        
+        if (windowSizeField) node.properties.windowSize = parseInt(windowSizeField.value);
+        if (resetOnStartField) node.properties.resetOnStart = resetOnStartField.checked;
+    },
+    
+    // Update PID properties
+    updatePidProperties(node) {
+        const kpField = document.getElementById("prop-kp");
+        const kiField = document.getElementById("prop-ki");
+        const kdField = document.getElementById("prop-kd");
+        const outputMinField = document.getElementById("prop-outputMin");
+        const outputMaxField = document.getElementById("prop-outputMax");
+        
+        if (kpField) node.properties.kp = parseFloat(kpField.value);
+        if (kiField) node.properties.ki = parseFloat(kiField.value);
+        if (kdField) node.properties.kd = parseFloat(kdField.value);
+        if (outputMinField) node.properties.outputMin = parseFloat(outputMinField.value);
+        if (outputMaxField) node.properties.outputMax = parseFloat(outputMaxField.value);
+    },
+    
+    // Logic gate node properties (simple - only name)
+    generateLogicGateProperties(node) {
+        return `
+            <div class="property">
+                <p>This logic gate has no additional configuration options.</p>
+            </div>
+        `;
+    },
+    
+    // Update logic gate properties
+    updateLogicGateProperties(node) {
+        // Logic gates only have name property which is handled by common update
+    },
+    
+    // Reset PID controller
+    resetPidController(node) {
+        if (node.constructor.name === 'PidControllerNode') {
+            node.lastError = 0;
+            node.integral = 0;
+            node.output = 0;
+            node.lastTime = null;
+            
+            // Show confirmation
+            const button = document.getElementById("reset-pid");
+            if (button) {
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i> Reset!';
+                button.style.backgroundColor = '#27AE60';
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.style.backgroundColor = '#E67E22';
+                }, 1000);
+            }
+        }
     },
     
     // Show update confirmation
