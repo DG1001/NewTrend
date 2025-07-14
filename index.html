@@ -78,12 +78,29 @@
     <script src="js/nodes/sensors/DisplayNode.js"></script>
     <script src="js/nodes/sensors/ConstantNode.js"></script>
     
+    <!-- Node classes - Processing & Analysis -->
+    <script src="js/nodes/processing/FilterNode.js"></script>
+    <script src="js/nodes/processing/StatisticsNode.js"></script>
+    <script src="js/nodes/processing/FormulaNode.js"></script>
+    
     <!-- Node classes - Visualization -->
     <script src="js/nodes/visualization/GaugeNode.js"></script>
-    <!-- TODO: Add remaining node scripts as they are extracted -->
+    <script src="js/nodes/visualization/ChartNode.js"></script>
+    <script src="js/nodes/visualization/LedIndicatorNode.js"></script>
     
-    <!-- Legacy compatibility layer (will be removed) -->
-    <!-- <script src="app.js"></script> -->
+    <!-- Node classes - Logic & Control -->
+    <script src="js/nodes/logic/AndGateNode.js"></script>
+    <script src="js/nodes/logic/OrGateNode.js"></script>
+    <script src="js/nodes/logic/NotGateNode.js"></script>
+    <script src="js/nodes/logic/ComparatorNode.js"></script>
+    <script src="js/nodes/logic/CounterNode.js"></script>
+    
+    <!-- Node classes - Automation -->
+    <script src="js/nodes/automation/TimerNode.js"></script>
+    <script src="js/nodes/automation/PidControllerNode.js"></script>
+    <script src="js/nodes/automation/AlarmNode.js"></script>
+    
+    <!-- Legacy app.js has been completely replaced by modular architecture -->
     
     <!-- Main entry point -->
     <script src="js/main.js"></script>
