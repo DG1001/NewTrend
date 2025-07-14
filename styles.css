@@ -185,6 +185,26 @@ main {
     padding-left: 12px;
 }
 
+.filter-properties {
+    border-left: 4px solid #F39C12;
+    padding-left: 12px;
+}
+
+.statistics-properties {
+    border-left: 4px solid #16A085;
+    padding-left: 12px;
+}
+
+.timer-properties {
+    border-left: 4px solid #8E44AD;
+    padding-left: 12px;
+}
+
+.constant-properties {
+    border-left: 4px solid #95A5A6;
+    padding-left: 12px;
+}
+
 /* Formula editor styling */
 .formula-editor {
     background-color: #f8f9fa;

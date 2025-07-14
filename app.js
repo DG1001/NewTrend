@@ -145,6 +145,10 @@ function setupEventListeners() {
     document.getElementById("add-display").addEventListener("click", addDisplayNode);
     document.getElementById("add-formula").addEventListener("click", addFormulaNode);
     document.getElementById("add-alarm").addEventListener("click", addAlarmNode);
+    document.getElementById("add-filter").addEventListener("click", addFilterNode);
+    document.getElementById("add-statistics").addEventListener("click", addStatisticsNode);
+    document.getElementById("add-timer").addEventListener("click", addTimerNode);
+    document.getElementById("add-constant").addEventListener("click", addConstantNode);
     document.getElementById("start-sim").addEventListener("click", startSimulation);
     document.getElementById("stop-sim").addEventListener("click", stopSimulation);
     
@@ -402,6 +406,402 @@ function registerCustomNodes() {
         }
     }
     LiteGraph.registerNodeType("trendows/alarm", AlarmNode);
+    
+    // Filter-Knoten
+    class FilterNode extends LiteGraph.LGraphNode {
+        constructor() {
+            super();
+            this.title = "Filter";
+            this.addInput("Input", "number");
+            this.addOutput("Output", "number");
+            this.properties = {
+                type: "movingAverage", // movingAverage, lowPass
+                windowSize: 5,
+                alpha: 0.1, // für low-pass filter
+                name: "Filter 1"
+            };
+            this.size = [180, 70];
+            this.color = "#F39C12";
+            this.buffer = [];
+            this.lastOutput = 0;
+        }
+        
+        getMenuOptions() {
+            return [
+                {
+                    content: "Properties",
+                    callback: () => {
+                        if (graph) {
+                            graph.selectNode(this);
+                            showNodeProperties(this);
+                        }
+                    }
+                },
+                null,
+                {
+                    content: "Clone",
+                    callback: () => {
+                        const cloned = LiteGraph.createNode(this.constructor.type);
+                        cloned.pos = [this.pos[0] + 50, this.pos[1] + 50];
+                        Object.assign(cloned.properties, this.properties);
+                        graph.add(cloned);
+                    }
+                },
+                {
+                    content: "Remove",
+                    callback: () => {
+                        graph.remove(this);
+                    }
+                }
+            ];
+        }
+        
+        onExecute() {
+            const input = this.getInputData(0);
+            let output = this.lastOutput;
+            
+            if (input !== undefined && simulationRunning) {
+                if (this.properties.type === "movingAverage") {
+                    // Moving Average Filter
+                    this.buffer.push(input);
+                    if (this.buffer.length > this.properties.windowSize) {
+                        this.buffer.shift();
+                    }
+                    
+                    const sum = this.buffer.reduce((a, b) => a + b, 0);
+                    output = sum / this.buffer.length;
+                } else if (this.properties.type === "lowPass") {
+                    // Low-pass Filter (exponential smoothing)
+                    const alpha = Math.max(0.01, Math.min(1.0, this.properties.alpha));
+                    output = alpha * input + (1 - alpha) * this.lastOutput;
+                }
+                
+                this.lastOutput = output;
+            }
+            
+            this.setOutputData(0, output);
+        }
+        
+        onDrawForeground(ctx) {
+            ctx.font = "14px Arial";
+            ctx.fillStyle = "#000";
+            ctx.textAlign = "center";
+            
+            const typeText = this.properties.type === "movingAverage" ? "MA" : "LP";
+            ctx.fillText(typeText, this.size[0] * 0.5, 45);
+            
+            if (this.properties.type === "movingAverage") {
+                ctx.font = "12px Arial";
+                ctx.fillText(`N=${this.properties.windowSize}`, this.size[0] * 0.5, 58);
+            } else {
+                ctx.font = "12px Arial";
+                ctx.fillText(`α=${this.properties.alpha.toFixed(2)}`, this.size[0] * 0.5, 58);
+            }
+        }
+    }
+    LiteGraph.registerNodeType("trendows/filter", FilterNode);
+    
+    // Statistik-Knoten
+    class StatisticsNode extends LiteGraph.LGraphNode {
+        constructor() {
+            super();
+            this.title = "Statistik";
+            this.addInput("Input", "number");
+            this.addOutput("Min", "number");
+            this.addOutput("Max", "number");
+            this.addOutput("Avg", "number");
+            this.properties = {
+                windowSize: 10,
+                resetOnOverflow: true,
+                name: "Statistik 1"
+            };
+            this.size = [180, 90];
+            this.color = "#16A085";
+            this.buffer = [];
+            this.statistics = { min: 0, max: 0, avg: 0 };
+        }
+        
+        getMenuOptions() {
+            return [
+                {
+                    content: "Properties",
+                    callback: () => {
+                        if (graph) {
+                            graph.selectNode(this);
+                            showNodeProperties(this);
+                        }
+                    }
+                },
+                null,
+                {
+                    content: "Clone",
+                    callback: () => {
+                        const cloned = LiteGraph.createNode(this.constructor.type);
+                        cloned.pos = [this.pos[0] + 50, this.pos[1] + 50];
+                        Object.assign(cloned.properties, this.properties);
+                        graph.add(cloned);
+                    }
+                },
+                {
+                    content: "Remove",
+                    callback: () => {
+                        graph.remove(this);
+                    }
+                }
+            ];
+        }
+        
+        onExecute() {
+            const input = this.getInputData(0);
+            
+            if (input !== undefined && simulationRunning) {
+                this.buffer.push(input);
+                
+                if (this.buffer.length > this.properties.windowSize) {
+                    if (this.properties.resetOnOverflow) {
+                        this.buffer.shift();
+                    } else {
+                        this.buffer = this.buffer.slice(-this.properties.windowSize);
+                    }
+                }
+                
+                if (this.buffer.length > 0) {
+                    this.statistics.min = Math.min(...this.buffer);
+                    this.statistics.max = Math.max(...this.buffer);
+                    this.statistics.avg = this.buffer.reduce((a, b) => a + b, 0) / this.buffer.length;
+                }
+            }
+            
+            this.setOutputData(0, this.statistics.min);
+            this.setOutputData(1, this.statistics.max);
+            this.setOutputData(2, this.statistics.avg);
+        }
+        
+        onDrawForeground(ctx) {
+            ctx.font = "12px Arial";
+            ctx.fillStyle = "#000";
+            ctx.textAlign = "left";
+            
+            ctx.fillText(`Min: ${this.statistics.min.toFixed(1)}`, 10, 45);
+            ctx.fillText(`Max: ${this.statistics.max.toFixed(1)}`, 10, 57);
+            ctx.fillText(`Avg: ${this.statistics.avg.toFixed(1)}`, 10, 69);
+            
+            ctx.textAlign = "right";
+            ctx.fillText(`N=${this.buffer.length}`, this.size[0] - 10, 45);
+        }
+    }
+    LiteGraph.registerNodeType("trendows/statistics", StatisticsNode);
+    
+    // Timer-Knoten
+    class TimerNode extends LiteGraph.LGraphNode {
+        constructor() {
+            super();
+            this.title = "Timer";
+            this.addInput("Trigger", "boolean");
+            this.addInput("Reset", "boolean");
+            this.addOutput("Output", "boolean");
+            this.addOutput("Elapsed", "number");
+            this.properties = {
+                duration: 5.0, // seconds
+                mode: "oneShot", // oneShot, interval
+                autoReset: false,
+                name: "Timer 1"
+            };
+            this.size = [180, 80];
+            this.color = "#8E44AD";
+            this.startTime = null;
+            this.isRunning = false;
+            this.output = false;
+        }
+        
+        getMenuOptions() {
+            return [
+                {
+                    content: "Properties",
+                    callback: () => {
+                        if (graph) {
+                            graph.selectNode(this);
+                            showNodeProperties(this);
+                        }
+                    }
+                },
+                null,
+                {
+                    content: "Clone",
+                    callback: () => {
+                        const cloned = LiteGraph.createNode(this.constructor.type);
+                        cloned.pos = [this.pos[0] + 50, this.pos[1] + 50];
+                        Object.assign(cloned.properties, this.properties);
+                        graph.add(cloned);
+                    }
+                },
+                {
+                    content: "Remove",
+                    callback: () => {
+                        graph.remove(this);
+                    }
+                }
+            ];
+        }
+        
+        onExecute() {
+            const trigger = this.getInputData(0);
+            const reset = this.getInputData(1);
+            const currentTime = Date.now() / 1000; // seconds
+            
+            // Reset logic
+            if (reset) {
+                this.startTime = null;
+                this.isRunning = false;
+                this.output = false;
+            }
+            
+            // Trigger logic
+            if (trigger && !this.isRunning && simulationRunning) {
+                this.startTime = currentTime;
+                this.isRunning = true;
+                this.output = false;
+            }
+            
+            // Timer logic
+            if (this.isRunning && this.startTime !== null) {
+                const elapsed = currentTime - this.startTime;
+                
+                if (elapsed >= this.properties.duration) {
+                    this.output = true;
+                    
+                    if (this.properties.mode === "oneShot") {
+                        this.isRunning = false;
+                        if (this.properties.autoReset) {
+                            this.output = false;
+                        }
+                    } else if (this.properties.mode === "interval") {
+                        // Restart for interval mode
+                        this.startTime = currentTime;
+                        this.output = false;
+                    }
+                }
+                
+                this.setOutputData(1, elapsed);
+            } else {
+                this.setOutputData(1, 0);
+            }
+            
+            this.setOutputData(0, this.output);
+        }
+        
+        onDrawForeground(ctx) {
+            ctx.font = "14px Arial";
+            ctx.fillStyle = "#000";
+            ctx.textAlign = "center";
+            
+            const status = this.isRunning ? "RUN" : (this.output ? "OUT" : "IDLE");
+            ctx.fillText(status, this.size[0] * 0.5, 45);
+            
+            ctx.font = "12px Arial";
+            ctx.fillText(`${this.properties.duration}s`, this.size[0] * 0.5, 58);
+            
+            // Visual indicator
+            ctx.fillStyle = this.isRunning ? "#27AE60" : (this.output ? "#E74C3C" : "#BDC3C7");
+            ctx.beginPath();
+            ctx.arc(this.size[0] - 15, 15, 8, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+    LiteGraph.registerNodeType("trendows/timer", TimerNode);
+    
+    // Konstante-Knoten
+    class ConstantNode extends LiteGraph.LGraphNode {
+        constructor() {
+            super();
+            this.title = "Konstante";
+            this.addOutput("Value", "number");
+            this.properties = {
+                value: 1.0,
+                type: "number", // number, boolean, string
+                boolValue: true,
+                stringValue: "text",
+                name: "Konstante 1"
+            };
+            this.size = [160, 50];
+            this.color = "#95A5A6";
+        }
+        
+        getMenuOptions() {
+            return [
+                {
+                    content: "Properties",
+                    callback: () => {
+                        if (graph) {
+                            graph.selectNode(this);
+                            showNodeProperties(this);
+                        }
+                    }
+                },
+                null,
+                {
+                    content: "Clone",
+                    callback: () => {
+                        const cloned = LiteGraph.createNode(this.constructor.type);
+                        cloned.pos = [this.pos[0] + 50, this.pos[1] + 50];
+                        Object.assign(cloned.properties, this.properties);
+                        graph.add(cloned);
+                    }
+                },
+                {
+                    content: "Remove",
+                    callback: () => {
+                        graph.remove(this);
+                    }
+                }
+            ];
+        }
+        
+        onExecute() {
+            let output;
+            switch (this.properties.type) {
+                case "number":
+                    output = this.properties.value;
+                    break;
+                case "boolean":
+                    output = this.properties.boolValue;
+                    break;
+                case "string":
+                    output = this.properties.stringValue;
+                    break;
+                default:
+                    output = this.properties.value;
+            }
+            
+            this.setOutputData(0, output);
+        }
+        
+        onDrawForeground(ctx) {
+            ctx.font = "16px Arial";
+            ctx.fillStyle = "#000";
+            ctx.textAlign = "center";
+            
+            let displayValue;
+            switch (this.properties.type) {
+                case "number":
+                    displayValue = this.properties.value.toString();
+                    break;
+                case "boolean":
+                    displayValue = this.properties.boolValue ? "TRUE" : "FALSE";
+                    break;
+                case "string":
+                    displayValue = this.properties.stringValue.length > 8 ? 
+                        this.properties.stringValue.substring(0, 8) + "..." : 
+                        this.properties.stringValue;
+                    break;
+                default:
+                    displayValue = "?";
+            }
+            
+            ctx.fillText(displayValue, this.size[0] * 0.5, 35);
+        }
+    }
+    LiteGraph.registerNodeType("trendows/constant", ConstantNode);
 }
 
 // Knoten zum Graph hinzufügen
@@ -457,6 +857,58 @@ function addAlarmNode() {
     flashToolbarButton("add-alarm");
 }
 
+function addFilterNode() {
+    const node = LiteGraph.createNode("trendows/filter");
+    node.pos = [100 + Math.random() * 300, 400 + Math.random() * 200];
+    graph.add(node);
+    
+    // Automatisch Eigenschaften anzeigen
+    graph.selectNode(node);
+    showNodeProperties(node);
+    
+    // Visuelles Feedback
+    flashToolbarButton("add-filter");
+}
+
+function addStatisticsNode() {
+    const node = LiteGraph.createNode("trendows/statistics");
+    node.pos = [300 + Math.random() * 300, 400 + Math.random() * 200];
+    graph.add(node);
+    
+    // Automatisch Eigenschaften anzeigen
+    graph.selectNode(node);
+    showNodeProperties(node);
+    
+    // Visuelles Feedback
+    flashToolbarButton("add-statistics");
+}
+
+function addTimerNode() {
+    const node = LiteGraph.createNode("trendows/timer");
+    node.pos = [500 + Math.random() * 300, 400 + Math.random() * 200];
+    graph.add(node);
+    
+    // Automatisch Eigenschaften anzeigen
+    graph.selectNode(node);
+    showNodeProperties(node);
+    
+    // Visuelles Feedback
+    flashToolbarButton("add-timer");
+}
+
+function addConstantNode() {
+    const node = LiteGraph.createNode("trendows/constant");
+    node.pos = [200 + Math.random() * 300, 500 + Math.random() * 200];
+    graph.add(node);
+    
+    // Automatisch Eigenschaften anzeigen
+    graph.selectNode(node);
+    showNodeProperties(node);
+    
+    // Visuelles Feedback
+    flashToolbarButton("add-constant");
+}
+
 // Visuelles Feedback für Buttons
 function flashToolbarButton(buttonId) {
     const button = document.getElementById(buttonId);
@@ -502,6 +954,18 @@ function showNodeProperties(node) {
     } else if (node.constructor.name === "AlarmNode") {
         nodeTypeClass = "alarm-properties";
         nodeIcon = "fa-bell";
+    } else if (node.constructor.name === "FilterNode") {
+        nodeTypeClass = "filter-properties";
+        nodeIcon = "fa-filter";
+    } else if (node.constructor.name === "StatisticsNode") {
+        nodeTypeClass = "statistics-properties";
+        nodeIcon = "fa-chart-bar";
+    } else if (node.constructor.name === "TimerNode") {
+        nodeTypeClass = "timer-properties";
+        nodeIcon = "fa-clock";
+    } else if (node.constructor.name === "ConstantNode") {
+        nodeTypeClass = "constant-properties";
+        nodeIcon = "fa-hashtag";
     }
     
     let html = `
@@ -641,6 +1105,84 @@ function showNodeProperties(node) {
                     <span style="margin-left: 5px;">Alarm wird ausgelöst, wenn der Wert 
                     <strong>${node.properties.condition === "greater" ? "größer als" : "kleiner als"} ${node.properties.threshold}</strong> ist.</span>
                 </div>
+            </div>
+        `;
+    } else if (node.constructor.name === "FilterNode") {
+        html += `
+            <div class="property">
+                <label>Filter-Typ:</label>
+                <select id="prop-filterType">
+                    <option value="movingAverage" ${node.properties.type === "movingAverage" ? "selected" : ""}>Gleitender Mittelwert</option>
+                    <option value="lowPass" ${node.properties.type === "lowPass" ? "selected" : ""}>Tiefpass-Filter</option>
+                </select>
+            </div>
+            <div class="property" id="moving-average-settings" ${node.properties.type !== "movingAverage" ? 'style="display:none;"' : ''}>
+                <label>Fenstergröße:</label>
+                <input type="number" id="prop-windowSize" value="${node.properties.windowSize}" min="2" max="50">
+            </div>
+            <div class="property" id="lowpass-settings" ${node.properties.type !== "lowPass" ? 'style="display:none;"' : ''}>
+                <label>Alpha (Glättungsfaktor):</label>
+                <input type="range" id="prop-alpha" value="${node.properties.alpha}" min="0.01" max="1.0" step="0.01">
+                <span id="alpha-value">${node.properties.alpha.toFixed(2)}</span>
+            </div>
+        `;
+    } else if (node.constructor.name === "StatisticsNode") {
+        html += `
+            <div class="property">
+                <label>Fenstergröße:</label>
+                <input type="number" id="prop-statsWindowSize" value="${node.properties.windowSize}" min="2" max="100">
+            </div>
+            <div class="property">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="prop-resetOnOverflow" ${node.properties.resetOnOverflow ? "checked" : ""}>
+                    <label for="prop-resetOnOverflow" style="display: inline; font-weight: normal;">Bei Überlauf zurücksetzen</label>
+                </div>
+            </div>
+        `;
+    } else if (node.constructor.name === "TimerNode") {
+        html += `
+            <div class="property">
+                <label>Dauer (Sekunden):</label>
+                <input type="number" id="prop-duration" value="${node.properties.duration}" min="0.1" max="3600" step="0.1">
+            </div>
+            <div class="property">
+                <label>Modus:</label>
+                <select id="prop-timerMode">
+                    <option value="oneShot" ${node.properties.mode === "oneShot" ? "selected" : ""}>Einmalig</option>
+                    <option value="interval" ${node.properties.mode === "interval" ? "selected" : ""}>Intervall</option>
+                </select>
+            </div>
+            <div class="property">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="prop-autoReset" ${node.properties.autoReset ? "checked" : ""}>
+                    <label for="prop-autoReset" style="display: inline; font-weight: normal;">Automatisch zurücksetzen</label>
+                </div>
+            </div>
+        `;
+    } else if (node.constructor.name === "ConstantNode") {
+        html += `
+            <div class="property">
+                <label>Typ:</label>
+                <select id="prop-constantType">
+                    <option value="number" ${node.properties.type === "number" ? "selected" : ""}>Zahl</option>
+                    <option value="boolean" ${node.properties.type === "boolean" ? "selected" : ""}>Boolean</option>
+                    <option value="string" ${node.properties.type === "string" ? "selected" : ""}>Text</option>
+                </select>
+            </div>
+            <div class="property" id="number-input" ${node.properties.type !== "number" ? 'style="display:none;"' : ''}>
+                <label>Wert:</label>
+                <input type="number" id="prop-numberValue" value="${node.properties.value}" step="any">
+            </div>
+            <div class="property" id="boolean-input" ${node.properties.type !== "boolean" ? 'style="display:none;"' : ''}>
+                <label>Wert:</label>
+                <select id="prop-boolValue">
+                    <option value="true" ${node.properties.boolValue ? "selected" : ""}>True</option>
+                    <option value="false" ${!node.properties.boolValue ? "selected" : ""}>False</option>
+                </select>
+            </div>
+            <div class="property" id="string-input" ${node.properties.type !== "string" ? 'style="display:none;"' : ''}>
+                <label>Wert:</label>
+                <input type="text" id="prop-stringValue" value="${node.properties.stringValue}">
             </div>
         `;
     }
@@ -812,6 +1354,45 @@ function showNodeProperties(node) {
                 });
             }
         }
+    } else if (node.constructor.name === "FilterNode") {
+        // Event-Listener für Filter-Typ Änderung
+        const filterTypeSelect = document.getElementById("prop-filterType");
+        const movingAverageSettings = document.getElementById("moving-average-settings");
+        const lowpassSettings = document.getElementById("lowpass-settings");
+        const alphaSlider = document.getElementById("prop-alpha");
+        const alphaValue = document.getElementById("alpha-value");
+        
+        if (filterTypeSelect) {
+            filterTypeSelect.addEventListener("change", function() {
+                if (this.value === "movingAverage") {
+                    movingAverageSettings.style.display = "block";
+                    lowpassSettings.style.display = "none";
+                } else {
+                    movingAverageSettings.style.display = "none";
+                    lowpassSettings.style.display = "block";
+                }
+            });
+        }
+        
+        if (alphaSlider && alphaValue) {
+            alphaSlider.addEventListener("input", function() {
+                alphaValue.textContent = parseFloat(this.value).toFixed(2);
+            });
+        }
+    } else if (node.constructor.name === "ConstantNode") {
+        // Event-Listener für Konstanten-Typ Änderung
+        const constantTypeSelect = document.getElementById("prop-constantType");
+        const numberInput = document.getElementById("number-input");
+        const booleanInput = document.getElementById("boolean-input");
+        const stringInput = document.getElementById("string-input");
+        
+        if (constantTypeSelect) {
+            constantTypeSelect.addEventListener("change", function() {
+                numberInput.style.display = this.value === "number" ? "block" : "none";
+                booleanInput.style.display = this.value === "boolean" ? "block" : "none";
+                stringInput.style.display = this.value === "string" ? "block" : "none";
+            });
+        }
     }
     
     // Event-Listener für Aktualisieren-Button
@@ -842,6 +1423,30 @@ function showNodeProperties(node) {
         } else if (node.constructor.name === "AlarmNode") {
             node.properties.threshold = parseFloat(document.getElementById("prop-threshold").value);
             node.properties.condition = document.getElementById("prop-condition").value;
+        } else if (node.constructor.name === "FilterNode") {
+            node.properties.type = document.getElementById("prop-filterType").value;
+            node.properties.windowSize = parseInt(document.getElementById("prop-windowSize").value);
+            node.properties.alpha = parseFloat(document.getElementById("prop-alpha").value);
+        } else if (node.constructor.name === "StatisticsNode") {
+            node.properties.windowSize = parseInt(document.getElementById("prop-statsWindowSize").value);
+            node.properties.resetOnOverflow = document.getElementById("prop-resetOnOverflow").checked;
+        } else if (node.constructor.name === "TimerNode") {
+            node.properties.duration = parseFloat(document.getElementById("prop-duration").value);
+            node.properties.mode = document.getElementById("prop-timerMode").value;
+            node.properties.autoReset = document.getElementById("prop-autoReset").checked;
+        } else if (node.constructor.name === "ConstantNode") {
+            node.properties.type = document.getElementById("prop-constantType").value;
+            switch (node.properties.type) {
+                case "number":
+                    node.properties.value = parseFloat(document.getElementById("prop-numberValue").value);
+                    break;
+                case "boolean":
+                    node.properties.boolValue = document.getElementById("prop-boolValue").value === "true";
+                    break;
+                case "string":
+                    node.properties.stringValue = document.getElementById("prop-stringValue").value;
+                    break;
+            }
         }
         
         // Bestätigungsnachricht anzeigen
