@@ -28,8 +28,26 @@ header h1 {
 .toolbar {
     margin-top: 12px;
     display: flex;
-    gap: 12px;
+    gap: 8px;
     flex-wrap: wrap;
+    align-items: center;
+}
+
+/* Toolbar sections for better organization */
+.toolbar button {
+    margin-right: 4px;
+}
+
+/* Add visual separators between groups */
+.toolbar button:nth-child(3)::after,    /* After Konstante */
+.toolbar button:nth-child(6)::after,    /* After Formel */
+.toolbar button:nth-child(11)::after,   /* After Zähler */
+.toolbar button:nth-child(14)::after {  /* After Alarm */
+    content: "|";
+    color: rgba(255, 255, 255, 0.3);
+    margin-left: 12px;
+    margin-right: 8px;
+    font-weight: normal;
 }
 
 button {
@@ -202,6 +220,26 @@ main {
 
 .constant-properties {
     border-left: 4px solid #95A5A6;
+    padding-left: 12px;
+}
+
+.logic-properties {
+    border-left: 4px solid #34495E;
+    padding-left: 12px;
+}
+
+.comparator-properties {
+    border-left: 4px solid #E67E22;
+    padding-left: 12px;
+}
+
+.counter-properties {
+    border-left: 4px solid #D35400;
+    padding-left: 12px;
+}
+
+.pid-properties {
+    border-left: 4px solid #2C3E50;
     padding-left: 12px;
 }
 

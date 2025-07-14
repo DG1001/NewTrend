@@ -149,6 +149,12 @@ function setupEventListeners() {
     document.getElementById("add-statistics").addEventListener("click", addStatisticsNode);
     document.getElementById("add-timer").addEventListener("click", addTimerNode);
     document.getElementById("add-constant").addEventListener("click", addConstantNode);
+    document.getElementById("add-and").addEventListener("click", addAndGateNode);
+    document.getElementById("add-or").addEventListener("click", addOrGateNode);
+    document.getElementById("add-not").addEventListener("click", addNotGateNode);
+    document.getElementById("add-comparator").addEventListener("click", addComparatorNode);
+    document.getElementById("add-counter").addEventListener("click", addCounterNode);
+    document.getElementById("add-pid").addEventListener("click", addPidNode);
     document.getElementById("start-sim").addEventListener("click", startSimulation);
     document.getElementById("stop-sim").addEventListener("click", stopSimulation);
     
@@ -802,6 +808,545 @@ function registerCustomNodes() {
         }
     }
     LiteGraph.registerNodeType("trendows/constant", ConstantNode);
+    
+    // AND Logic Gate
+    class AndGateNode extends LiteGraph.LGraphNode {
+        constructor() {
+            super();
+            this.title = "AND";
+            this.addInput("A", "boolean");
+            this.addInput("B", "boolean");
+            this.addOutput("Output", "boolean");
+            this.properties = {
+                name: "AND Gate 1"
+            };
+            this.size = [120, 60];
+            this.color = "#34495E";
+            this.result = false;
+        }
+        
+        getMenuOptions() {
+            return [
+                {
+                    content: "Properties",
+                    callback: () => {
+                        if (graph) {
+                            graph.selectNode(this);
+                            showNodeProperties(this);
+                        }
+                    }
+                },
+                {
+                    content: "Add Input",
+                    callback: () => {
+                        const inputCount = this.inputs.length;
+                        this.addInput(`Input${inputCount + 1}`, "boolean");
+                        this.size[1] = Math.max(60, 30 + this.inputs.length * 15);
+                    }
+                },
+                null,
+                {
+                    content: "Clone",
+                    callback: () => {
+                        const cloned = LiteGraph.createNode(this.constructor.type);
+                        cloned.pos = [this.pos[0] + 50, this.pos[1] + 50];
+                        Object.assign(cloned.properties, this.properties);
+                        graph.add(cloned);
+                    }
+                },
+                {
+                    content: "Remove",
+                    callback: () => {
+                        graph.remove(this);
+                    }
+                }
+            ];
+        }
+        
+        onExecute() {
+            let result = true;
+            for (let i = 0; i < this.inputs.length; i++) {
+                const input = this.getInputData(i);
+                if (!input) {
+                    result = false;
+                    break;
+                }
+            }
+            this.result = result;
+            this.setOutputData(0, result);
+        }
+        
+        onDrawForeground(ctx) {
+            ctx.font = "14px Arial";
+            ctx.fillStyle = this.result ? "#27AE60" : "#E74C3C";
+            ctx.textAlign = "center";
+            ctx.fillText("AND", this.size[0] * 0.5, this.size[1] * 0.5 + 5);
+            
+            // LED indicator
+            ctx.fillStyle = this.result ? "#27AE60" : "#BDC3C7";
+            ctx.beginPath();
+            ctx.arc(this.size[0] - 15, 15, 6, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+    LiteGraph.registerNodeType("trendows/and", AndGateNode);
+    
+    // OR Logic Gate
+    class OrGateNode extends LiteGraph.LGraphNode {
+        constructor() {
+            super();
+            this.title = "OR";
+            this.addInput("A", "boolean");
+            this.addInput("B", "boolean");
+            this.addOutput("Output", "boolean");
+            this.properties = {
+                name: "OR Gate 1"
+            };
+            this.size = [120, 60];
+            this.color = "#34495E";
+            this.result = false;
+        }
+        
+        getMenuOptions() {
+            return [
+                {
+                    content: "Properties",
+                    callback: () => {
+                        if (graph) {
+                            graph.selectNode(this);
+                            showNodeProperties(this);
+                        }
+                    }
+                },
+                {
+                    content: "Add Input",
+                    callback: () => {
+                        const inputCount = this.inputs.length;
+                        this.addInput(`Input${inputCount + 1}`, "boolean");
+                        this.size[1] = Math.max(60, 30 + this.inputs.length * 15);
+                    }
+                },
+                null,
+                {
+                    content: "Clone",
+                    callback: () => {
+                        const cloned = LiteGraph.createNode(this.constructor.type);
+                        cloned.pos = [this.pos[0] + 50, this.pos[1] + 50];
+                        Object.assign(cloned.properties, this.properties);
+                        graph.add(cloned);
+                    }
+                },
+                {
+                    content: "Remove",
+                    callback: () => {
+                        graph.remove(this);
+                    }
+                }
+            ];
+        }
+        
+        onExecute() {
+            let result = false;
+            for (let i = 0; i < this.inputs.length; i++) {
+                const input = this.getInputData(i);
+                if (input) {
+                    result = true;
+                    break;
+                }
+            }
+            this.result = result;
+            this.setOutputData(0, result);
+        }
+        
+        onDrawForeground(ctx) {
+            ctx.font = "14px Arial";
+            ctx.fillStyle = this.result ? "#27AE60" : "#E74C3C";
+            ctx.textAlign = "center";
+            ctx.fillText("OR", this.size[0] * 0.5, this.size[1] * 0.5 + 5);
+            
+            // LED indicator
+            ctx.fillStyle = this.result ? "#27AE60" : "#BDC3C7";
+            ctx.beginPath();
+            ctx.arc(this.size[0] - 15, 15, 6, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+    LiteGraph.registerNodeType("trendows/or", OrGateNode);
+    
+    // NOT Logic Gate
+    class NotGateNode extends LiteGraph.LGraphNode {
+        constructor() {
+            super();
+            this.title = "NOT";
+            this.addInput("Input", "boolean");
+            this.addOutput("Output", "boolean");
+            this.properties = {
+                name: "NOT Gate 1"
+            };
+            this.size = [120, 50];
+            this.color = "#34495E";
+            this.result = true;
+        }
+        
+        getMenuOptions() {
+            return [
+                {
+                    content: "Properties",
+                    callback: () => {
+                        if (graph) {
+                            graph.selectNode(this);
+                            showNodeProperties(this);
+                        }
+                    }
+                },
+                null,
+                {
+                    content: "Clone",
+                    callback: () => {
+                        const cloned = LiteGraph.createNode(this.constructor.type);
+                        cloned.pos = [this.pos[0] + 50, this.pos[1] + 50];
+                        Object.assign(cloned.properties, this.properties);
+                        graph.add(cloned);
+                    }
+                },
+                {
+                    content: "Remove",
+                    callback: () => {
+                        graph.remove(this);
+                    }
+                }
+            ];
+        }
+        
+        onExecute() {
+            const input = this.getInputData(0);
+            this.result = !input;
+            this.setOutputData(0, this.result);
+        }
+        
+        onDrawForeground(ctx) {
+            ctx.font = "14px Arial";
+            ctx.fillStyle = this.result ? "#27AE60" : "#E74C3C";
+            ctx.textAlign = "center";
+            ctx.fillText("NOT", this.size[0] * 0.5, this.size[1] * 0.5 + 5);
+            
+            // LED indicator
+            ctx.fillStyle = this.result ? "#27AE60" : "#BDC3C7";
+            ctx.beginPath();
+            ctx.arc(this.size[0] - 15, 12, 6, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+    LiteGraph.registerNodeType("trendows/not", NotGateNode);
+    
+    // Comparator Node
+    class ComparatorNode extends LiteGraph.LGraphNode {
+        constructor() {
+            super();
+            this.title = "Vergleich";
+            this.addInput("A", "number");
+            this.addInput("B", "number");
+            this.addOutput("A > B", "boolean");
+            this.addOutput("A = B", "boolean");
+            this.addOutput("A < B", "boolean");
+            this.properties = {
+                tolerance: 0.01,
+                name: "Vergleich 1"
+            };
+            this.size = [160, 90];
+            this.color = "#E67E22";
+            this.results = { greater: false, equal: false, less: false };
+        }
+        
+        getMenuOptions() {
+            return [
+                {
+                    content: "Properties",
+                    callback: () => {
+                        if (graph) {
+                            graph.selectNode(this);
+                            showNodeProperties(this);
+                        }
+                    }
+                },
+                null,
+                {
+                    content: "Clone",
+                    callback: () => {
+                        const cloned = LiteGraph.createNode(this.constructor.type);
+                        cloned.pos = [this.pos[0] + 50, this.pos[1] + 50];
+                        Object.assign(cloned.properties, this.properties);
+                        graph.add(cloned);
+                    }
+                },
+                {
+                    content: "Remove",
+                    callback: () => {
+                        graph.remove(this);
+                    }
+                }
+            ];
+        }
+        
+        onExecute() {
+            const a = this.getInputData(0) || 0;
+            const b = this.getInputData(1) || 0;
+            const tolerance = this.properties.tolerance;
+            
+            this.results.greater = a > b + tolerance;
+            this.results.equal = Math.abs(a - b) <= tolerance;
+            this.results.less = a < b - tolerance;
+            
+            this.setOutputData(0, this.results.greater);
+            this.setOutputData(1, this.results.equal);
+            this.setOutputData(2, this.results.less);
+        }
+        
+        onDrawForeground(ctx) {
+            ctx.font = "12px Arial";
+            ctx.textAlign = "right";
+            
+            // Show comparison results
+            ctx.fillStyle = this.results.greater ? "#27AE60" : "#BDC3C7";
+            ctx.fillText(">", this.size[0] - 10, 25);
+            
+            ctx.fillStyle = this.results.equal ? "#27AE60" : "#BDC3C7";
+            ctx.fillText("=", this.size[0] - 10, 45);
+            
+            ctx.fillStyle = this.results.less ? "#27AE60" : "#BDC3C7";
+            ctx.fillText("<", this.size[0] - 10, 65);
+        }
+    }
+    LiteGraph.registerNodeType("trendows/comparator", ComparatorNode);
+    
+    // Counter Node
+    class CounterNode extends LiteGraph.LGraphNode {
+        constructor() {
+            super();
+            this.title = "Zähler";
+            this.addInput("Trigger", "boolean");
+            this.addInput("Reset", "boolean");
+            this.addOutput("Count", "number");
+            this.addOutput("Overflow", "boolean");
+            this.properties = {
+                maxCount: 10,
+                resetOnOverflow: true,
+                name: "Zähler 1"
+            };
+            this.size = [150, 70];
+            this.color = "#D35400";
+            this.count = 0;
+            this.lastTrigger = false;
+            this.overflow = false;
+        }
+        
+        getMenuOptions() {
+            return [
+                {
+                    content: "Properties",
+                    callback: () => {
+                        if (graph) {
+                            graph.selectNode(this);
+                            showNodeProperties(this);
+                        }
+                    }
+                },
+                null,
+                {
+                    content: "Clone",
+                    callback: () => {
+                        const cloned = LiteGraph.createNode(this.constructor.type);
+                        cloned.pos = [this.pos[0] + 50, this.pos[1] + 50];
+                        Object.assign(cloned.properties, this.properties);
+                        graph.add(cloned);
+                    }
+                },
+                {
+                    content: "Remove",
+                    callback: () => {
+                        graph.remove(this);
+                    }
+                }
+            ];
+        }
+        
+        onExecute() {
+            const trigger = this.getInputData(0);
+            const reset = this.getInputData(1);
+            
+            // Reset logic
+            if (reset) {
+                this.count = 0;
+                this.overflow = false;
+            }
+            
+            // Trigger logic (edge detection)
+            if (trigger && !this.lastTrigger && simulationRunning) {
+                this.count++;
+                
+                if (this.count >= this.properties.maxCount) {
+                    this.overflow = true;
+                    if (this.properties.resetOnOverflow) {
+                        this.count = 0;
+                    }
+                }
+            }
+            
+            this.lastTrigger = trigger;
+            this.setOutputData(0, this.count);
+            this.setOutputData(1, this.overflow);
+        }
+        
+        onDrawForeground(ctx) {
+            ctx.font = "16px Arial";
+            ctx.fillStyle = "#000";
+            ctx.textAlign = "center";
+            ctx.fillText(this.count.toString(), this.size[0] * 0.5, 40);
+            
+            ctx.font = "10px Arial";
+            ctx.fillText(`/ ${this.properties.maxCount}`, this.size[0] * 0.5, 52);
+            
+            // Overflow indicator
+            if (this.overflow) {
+                ctx.fillStyle = "#E74C3C";
+                ctx.beginPath();
+                ctx.arc(this.size[0] - 15, 15, 6, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+    }
+    LiteGraph.registerNodeType("trendows/counter", CounterNode);
+    
+    // PID Controller Node
+    class PidControllerNode extends LiteGraph.LGraphNode {
+        constructor() {
+            super();
+            this.title = "PID Regler";
+            this.addInput("Setpoint", "number");
+            this.addInput("Process", "number");
+            this.addOutput("Output", "number");
+            this.properties = {
+                kp: 1.0,    // Proportional gain
+                ki: 0.1,    // Integral gain
+                kd: 0.01,   // Derivative gain
+                outputMin: -100,
+                outputMax: 100,
+                name: "PID Regler 1"
+            };
+            this.size = [180, 100];
+            this.color = "#2C3E50";
+            
+            // PID state variables
+            this.lastError = 0;
+            this.integral = 0;
+            this.lastTime = Date.now();
+            this.output = 0;
+        }
+        
+        getMenuOptions() {
+            return [
+                {
+                    content: "Properties",
+                    callback: () => {
+                        if (graph) {
+                            graph.selectNode(this);
+                            showNodeProperties(this);
+                        }
+                    }
+                },
+                {
+                    content: "Reset PID",
+                    callback: () => {
+                        this.lastError = 0;
+                        this.integral = 0;
+                        this.output = 0;
+                    }
+                },
+                null,
+                {
+                    content: "Clone",
+                    callback: () => {
+                        const cloned = LiteGraph.createNode(this.constructor.type);
+                        cloned.pos = [this.pos[0] + 50, this.pos[1] + 50];
+                        Object.assign(cloned.properties, this.properties);
+                        graph.add(cloned);
+                    }
+                },
+                {
+                    content: "Remove",
+                    callback: () => {
+                        graph.remove(this);
+                    }
+                }
+            ];
+        }
+        
+        onExecute() {
+            if (!simulationRunning) {
+                this.setOutputData(0, this.output);
+                return;
+            }
+            
+            const setpoint = this.getInputData(0) || 0;
+            const process = this.getInputData(1) || 0;
+            const currentTime = Date.now();
+            const deltaTime = (currentTime - this.lastTime) / 1000; // Convert to seconds
+            
+            if (deltaTime <= 0) {
+                this.setOutputData(0, this.output);
+                return;
+            }
+            
+            // Calculate error
+            const error = setpoint - process;
+            
+            // Proportional term
+            const proportional = this.properties.kp * error;
+            
+            // Integral term
+            this.integral += error * deltaTime;
+            const integral = this.properties.ki * this.integral;
+            
+            // Derivative term
+            const derivative = this.properties.kd * (error - this.lastError) / deltaTime;
+            
+            // Calculate output
+            this.output = proportional + integral + derivative;
+            
+            // Clamp output to limits
+            this.output = Math.max(this.properties.outputMin, 
+                         Math.min(this.properties.outputMax, this.output));
+            
+            // Integral windup prevention
+            if (this.output >= this.properties.outputMax || this.output <= this.properties.outputMin) {
+                this.integral -= error * deltaTime;
+            }
+            
+            // Update state
+            this.lastError = error;
+            this.lastTime = currentTime;
+            
+            this.setOutputData(0, this.output);
+        }
+        
+        onDrawForeground(ctx) {
+            ctx.font = "14px Arial";
+            ctx.fillStyle = "#000";
+            ctx.textAlign = "center";
+            ctx.fillText("PID", this.size[0] * 0.5, 30);
+            
+            ctx.font = "12px Arial";
+            ctx.fillText(`Out: ${this.output.toFixed(1)}`, this.size[0] * 0.5, 50);
+            
+            // Show PID gains
+            ctx.font = "10px Arial";
+            ctx.textAlign = "left";
+            ctx.fillText(`P:${this.properties.kp.toFixed(2)}`, 10, 70);
+            ctx.fillText(`I:${this.properties.ki.toFixed(2)}`, 60, 70);
+            ctx.fillText(`D:${this.properties.kd.toFixed(3)}`, 110, 70);
+        }
+    }
+    LiteGraph.registerNodeType("trendows/pid", PidControllerNode);
 }
 
 // Knoten zum Graph hinzufügen
@@ -909,6 +1454,84 @@ function addConstantNode() {
     flashToolbarButton("add-constant");
 }
 
+function addAndGateNode() {
+    const node = LiteGraph.createNode("trendows/and");
+    node.pos = [100 + Math.random() * 300, 600 + Math.random() * 200];
+    graph.add(node);
+    
+    // Automatisch Eigenschaften anzeigen
+    graph.selectNode(node);
+    showNodeProperties(node);
+    
+    // Visuelles Feedback
+    flashToolbarButton("add-and");
+}
+
+function addOrGateNode() {
+    const node = LiteGraph.createNode("trendows/or");
+    node.pos = [250 + Math.random() * 300, 600 + Math.random() * 200];
+    graph.add(node);
+    
+    // Automatisch Eigenschaften anzeigen
+    graph.selectNode(node);
+    showNodeProperties(node);
+    
+    // Visuelles Feedback
+    flashToolbarButton("add-or");
+}
+
+function addNotGateNode() {
+    const node = LiteGraph.createNode("trendows/not");
+    node.pos = [400 + Math.random() * 300, 600 + Math.random() * 200];
+    graph.add(node);
+    
+    // Automatisch Eigenschaften anzeigen
+    graph.selectNode(node);
+    showNodeProperties(node);
+    
+    // Visuelles Feedback
+    flashToolbarButton("add-not");
+}
+
+function addComparatorNode() {
+    const node = LiteGraph.createNode("trendows/comparator");
+    node.pos = [550 + Math.random() * 300, 600 + Math.random() * 200];
+    graph.add(node);
+    
+    // Automatisch Eigenschaften anzeigen
+    graph.selectNode(node);
+    showNodeProperties(node);
+    
+    // Visuelles Feedback
+    flashToolbarButton("add-comparator");
+}
+
+function addCounterNode() {
+    const node = LiteGraph.createNode("trendows/counter");
+    node.pos = [700 + Math.random() * 300, 600 + Math.random() * 200];
+    graph.add(node);
+    
+    // Automatisch Eigenschaften anzeigen
+    graph.selectNode(node);
+    showNodeProperties(node);
+    
+    // Visuelles Feedback
+    flashToolbarButton("add-counter");
+}
+
+function addPidNode() {
+    const node = LiteGraph.createNode("trendows/pid");
+    node.pos = [850 + Math.random() * 300, 600 + Math.random() * 200];
+    graph.add(node);
+    
+    // Automatisch Eigenschaften anzeigen
+    graph.selectNode(node);
+    showNodeProperties(node);
+    
+    // Visuelles Feedback
+    flashToolbarButton("add-pid");
+}
+
 // Visuelles Feedback für Buttons
 function flashToolbarButton(buttonId) {
     const button = document.getElementById(buttonId);
@@ -966,6 +1589,24 @@ function showNodeProperties(node) {
     } else if (node.constructor.name === "ConstantNode") {
         nodeTypeClass = "constant-properties";
         nodeIcon = "fa-hashtag";
+    } else if (node.constructor.name === "AndGateNode") {
+        nodeTypeClass = "logic-properties";
+        nodeIcon = "fa-square";
+    } else if (node.constructor.name === "OrGateNode") {
+        nodeTypeClass = "logic-properties";
+        nodeIcon = "fa-circle";
+    } else if (node.constructor.name === "NotGateNode") {
+        nodeTypeClass = "logic-properties";
+        nodeIcon = "fa-exclamation";
+    } else if (node.constructor.name === "ComparatorNode") {
+        nodeTypeClass = "comparator-properties";
+        nodeIcon = "fa-not-equal";
+    } else if (node.constructor.name === "CounterNode") {
+        nodeTypeClass = "counter-properties";
+        nodeIcon = "fa-sort-numeric-up";
+    } else if (node.constructor.name === "PidControllerNode") {
+        nodeTypeClass = "pid-properties";
+        nodeIcon = "fa-cogs";
     }
     
     let html = `
@@ -1185,6 +1826,70 @@ function showNodeProperties(node) {
                 <input type="text" id="prop-stringValue" value="${node.properties.stringValue}">
             </div>
         `;
+    } else if (node.constructor.name === "AndGateNode" || node.constructor.name === "OrGateNode" || node.constructor.name === "NotGateNode") {
+        html += `
+            <div class="property">
+                <label>Info:</label>
+                <p style="color: #666; font-size: 13px;">Logik-Gatter für boolesche Operationen. 
+                ${node.constructor.name === "AndGateNode" ? "AND: Alle Eingänge müssen aktiv sein." : 
+                  node.constructor.name === "OrGateNode" ? "OR: Mindestens ein Eingang muss aktiv sein." : 
+                  "NOT: Invertiert den Eingangswert."}</p>
+            </div>
+        `;
+    } else if (node.constructor.name === "ComparatorNode") {
+        html += `
+            <div class="property">
+                <label>Toleranz für Gleichheit:</label>
+                <input type="number" id="prop-tolerance" value="${node.properties.tolerance}" min="0" max="10" step="0.001">
+                <small>Werte gelten als gleich, wenn der Unterschied kleiner als die Toleranz ist.</small>
+            </div>
+        `;
+    } else if (node.constructor.name === "CounterNode") {
+        html += `
+            <div class="property">
+                <label>Maximaler Zählwert:</label>
+                <input type="number" id="prop-maxCount" value="${node.properties.maxCount}" min="1" max="1000">
+            </div>
+            <div class="property">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="prop-resetOnOverflow" ${node.properties.resetOnOverflow ? "checked" : ""}>
+                    <label for="prop-resetOnOverflow" style="display: inline; font-weight: normal;">Bei Überlauf zurücksetzen</label>
+                </div>
+            </div>
+        `;
+    } else if (node.constructor.name === "PidControllerNode") {
+        html += `
+            <div class="property">
+                <label>Proportional (Kp):</label>
+                <input type="number" id="prop-kp" value="${node.properties.kp}" min="0" max="100" step="0.1">
+            </div>
+            <div class="property">
+                <label>Integral (Ki):</label>
+                <input type="number" id="prop-ki" value="${node.properties.ki}" min="0" max="10" step="0.01">
+            </div>
+            <div class="property">
+                <label>Derivative (Kd):</label>
+                <input type="number" id="prop-kd" value="${node.properties.kd}" min="0" max="1" step="0.001">
+            </div>
+            <div class="property">
+                <label>Ausgabegrenzen:</label>
+                <div style="display: flex; gap: 10px;">
+                    <div style="flex: 1;">
+                        <label>Min:</label>
+                        <input type="number" id="prop-outputMin" value="${node.properties.outputMin}">
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Max:</label>
+                        <input type="number" id="prop-outputMax" value="${node.properties.outputMax}">
+                    </div>
+                </div>
+            </div>
+            <div class="property">
+                <button id="reset-pid" style="width: 100%; padding: 8px; background-color: #E67E22; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    <i class="fas fa-undo"></i> PID zurücksetzen
+                </button>
+            </div>
+        `;
     }
     
     html += `
@@ -1393,6 +2098,24 @@ function showNodeProperties(node) {
                 stringInput.style.display = this.value === "string" ? "block" : "none";
             });
         }
+    } else if (node.constructor.name === "PidControllerNode") {
+        // Event-Listener für PID Reset Button
+        const resetPidButton = document.getElementById("reset-pid");
+        if (resetPidButton) {
+            resetPidButton.addEventListener("click", function() {
+                node.lastError = 0;
+                node.integral = 0;
+                node.output = 0;
+                
+                // Visual feedback
+                this.innerHTML = '<i class="fas fa-check"></i> Zurückgesetzt!';
+                this.style.backgroundColor = '#27AE60';
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-undo"></i> PID zurücksetzen';
+                    this.style.backgroundColor = '#E67E22';
+                }, 1500);
+            });
+        }
     }
     
     // Event-Listener für Aktualisieren-Button
@@ -1447,6 +2170,17 @@ function showNodeProperties(node) {
                     node.properties.stringValue = document.getElementById("prop-stringValue").value;
                     break;
             }
+        } else if (node.constructor.name === "ComparatorNode") {
+            node.properties.tolerance = parseFloat(document.getElementById("prop-tolerance").value);
+        } else if (node.constructor.name === "CounterNode") {
+            node.properties.maxCount = parseInt(document.getElementById("prop-maxCount").value);
+            node.properties.resetOnOverflow = document.getElementById("prop-resetOnOverflow").checked;
+        } else if (node.constructor.name === "PidControllerNode") {
+            node.properties.kp = parseFloat(document.getElementById("prop-kp").value);
+            node.properties.ki = parseFloat(document.getElementById("prop-ki").value);
+            node.properties.kd = parseFloat(document.getElementById("prop-kd").value);
+            node.properties.outputMin = parseFloat(document.getElementById("prop-outputMin").value);
+            node.properties.outputMax = parseFloat(document.getElementById("prop-outputMax").value);
         }
         
         // Bestätigungsnachricht anzeigen
