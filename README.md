@@ -89,18 +89,49 @@ A web-based visual node editor for creating sensor monitoring and data processin
 ## Project Structure
 
 ```
-├── index.html          # Main application layout
-├── app.js              # Core application logic (monolithic bundle)
-├── app-minimal.js      # Minimal build without legacy support
-├── app-legacy.js       # Legacy browser support build
-├── js/                 # Modular application source code
-│   ├── core            # Core engine and application modules
-│   ├── nodes           # Node type definitions
-│   ├── utils           # Utility modules
-│   └── main.js         # Application entry point for modular code
-├── styles.css          # Complete styling and visual design
-├── CLAUDE.md           # AI development guidance
-└── README.md           # This file
+├── index.html              # Main application layout and HTML structure
+├── app.js                  # Core application logic (monolithic bundle for deployment)
+├── app-minimal.js          # Minimal build without legacy support
+├── app-legacy.js           # Legacy browser support build
+├── styles.css              # All CSS styles for the application
+├── js/                       # Modular JavaScript source code
+│   ├── main.js             # Main entry point, initializes the application
+│   ├── core/               # Core application components
+│   │   ├── Application.js      # Main application class, manages the graph and simulation
+│   │   ├── NodeRegistry.js     # Manages registration of all node types
+│   │   ├── PropertyPanel.js    # Handles the dynamic property panel for nodes
+│   │   └── SimulationEngine.js # Controls the real-time data simulation
+│   ├── nodes/                # All custom node definitions, categorized by function
+│   │   ├── automation/
+│   │   │   ├── AlarmNode.js
+│   │   │   ├── PidControllerNode.js
+│   │   │   └── TimerNode.js
+│   │   ├── base/
+│   │   │   └── BaseNode.js       # Base class for all custom nodes
+│   │   ├── logic/
+│   │   │   ├── AndGateNode.js
+│   │   │   ├── ComparatorNode.js
+│   │   │   ├── CounterNode.js
+│   │   │   ├── NotGateNode.js
+│   │   │   └── OrGateNode.js
+│   │   ├── processing/
+│   │   │   ├── FilterNode.js
+│   │   │   ├── FormulaNode.js
+│   │   │   └── StatisticsNode.js
+│   │   ├── sensors/
+│   │   │   ├── ConstantNode.js
+│   │   │   ├── DisplayNode.js
+│   │   │   └── SensorNode.js
+│   │   └── visualization/
+│   │       ├── ChartNode.js
+│   │       ├── GaugeNode.js
+│   │       └── LedIndicatorNode.js
+│   └── utils/                # Utility functions and classes
+│       ├── SensorData.js       # Manages historical data for sensors
+│       └── ToolbarHelpers.js   # Helper functions for creating toolbar buttons
+├── AGENTS.md               # Guidance for AI agents working on this project
+├── CLAUDE.md               # AI development guidance (legacy)
+└── README.md               # This file
 ```
 
 ## Technology Stack
