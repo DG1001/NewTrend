@@ -62,6 +62,30 @@
         <p>Trendows Web Prototyp - Kirsten Controls</p>
     </footer>
     
-    <script src="app.js"></script>
+    <!-- Base classes and utilities -->
+    <script src="js/nodes/base/BaseNode.js"></script>
+    <script src="js/utils/SensorData.js"></script>
+    <script src="js/utils/ToolbarHelpers.js"></script>
+    
+    <!-- Core modules -->
+    <script src="js/core/NodeRegistry.js"></script>
+    <script src="js/core/SimulationEngine.js"></script>
+    <script src="js/core/PropertyPanel.js"></script>
+    <script src="js/core/Application.js"></script>
+    
+    <!-- Node classes - Data Sources & Display -->
+    <script src="js/nodes/sensors/SensorNode.js"></script>
+    <script src="js/nodes/sensors/DisplayNode.js"></script>
+    <script src="js/nodes/sensors/ConstantNode.js"></script>
+    
+    <!-- Node classes - Visualization -->
+    <script src="js/nodes/visualization/GaugeNode.js"></script>
+    <!-- TODO: Add remaining node scripts as they are extracted -->
+    
+    <!-- Legacy compatibility layer (will be removed) -->
+    <!-- <script src="app.js"></script> -->
+    
+    <!-- Main entry point -->
+    <script src="js/main.js"></script>
 </body>
 </html>
