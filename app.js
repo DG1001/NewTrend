@@ -44,6 +44,18 @@ function initGraph() {
     graph.onBeforeStep = function() {
         graph.setDirtyCanvas(true);
     };
+    
+    // Override the canvas selection to trigger our properties panel
+    const originalSelectNode = canvas.selectNode;
+    canvas.selectNode = function(node) {
+        const result = originalSelectNode.call(this, node);
+        if (node) {
+            showNodeProperties(node);
+        } else {
+            showNodeProperties(null);
+        }
+        return result;
+    };
 }
 
 // Event-Listener einrichten
@@ -69,6 +81,17 @@ function resizeCanvas() {
     canvas.resize(container.clientWidth, container.clientHeight);
 }
 
+// Helper-Funktion für Operationssymbole
+function getOperationSymbol(operation) {
+    switch(operation) {
+        case "add": return "+";
+        case "subtract": return "−";
+        case "multiply": return "×";
+        case "divide": return "÷";
+        default: return "+";
+    }
+}
+
 // Eigene Knoten für Trendows registrieren
 function registerCustomNodes() {
     // Sensor-Knoten
@@ -88,6 +111,7 @@ function registerCustomNodes() {
             this.size = [180, 60];
             this.color = "#2E86C1";
         }
+        
         
         onExecute() {
             let value = 0;
@@ -185,7 +209,9 @@ function registerCustomNodes() {
             };
             this.size = [180, 90];
             this.color = "#9B59B6";
+            
         }
+        
         
         onExecute() {
             const a = this.getInputData(0) || 0;
@@ -306,6 +332,7 @@ function addSensorNode() {
     
     // Automatisch Eigenschaften anzeigen
     graph.selectNode(node);
+    showNodeProperties(node);
     
     // Visuelles Feedback
     flashToolbarButton("add-sensor");
@@ -318,6 +345,7 @@ function addDisplayNode() {
     
     // Automatisch Eigenschaften anzeigen
     graph.selectNode(node);
+    showNodeProperties(node);
     
     // Visuelles Feedback
     flashToolbarButton("add-display");
@@ -330,6 +358,7 @@ function addFormulaNode() {
     
     // Automatisch Eigenschaften anzeigen
     graph.selectNode(node);
+    showNodeProperties(node);
     
     // Visuelles Feedback
     flashToolbarButton("add-formula");
@@ -342,6 +371,7 @@ function addAlarmNode() {
     
     // Automatisch Eigenschaften anzeigen
     graph.selectNode(node);
+    showNodeProperties(node);
     
     // Visuelles Feedback
     flashToolbarButton("add-alarm");
@@ -457,38 +487,54 @@ function showNodeProperties(node) {
     } else if (node.constructor.name === "FormulaNode") {
         html += `
             <div class="property">
-                <div class="checkbox-wrapper">
-                    <input type="checkbox" id="prop-useCustomFormula" ${node.properties.useCustomFormula ? "checked" : ""}>
-                    <label for="prop-useCustomFormula" style="display: inline; font-weight: normal;">Benutzerdefinierte Formel verwenden</label>
+                <label>Formel-Modus:</label>
+                <div class="formula-mode-selector">
+                    <button type="button" class="formula-mode-btn ${!node.properties.useCustomFormula ? 'active' : ''}" data-mode="standard">
+                        <i class="fas fa-calculator"></i> Standard
+                    </button>
+                    <button type="button" class="formula-mode-btn ${node.properties.useCustomFormula ? 'active' : ''}" data-mode="custom">
+                        <i class="fas fa-code"></i> Erweitert
+                    </button>
                 </div>
             </div>
             
-            <div class="property formula-editor" id="standard-operations" ${node.properties.useCustomFormula ? 'style="display:none;"' : ''}>
-                <label>Operation:</label>
-                <select id="prop-operation">
-                    <option value="add" ${node.properties.operation === "add" ? "selected" : ""}>Addition (+)</option>
-                    <option value="subtract" ${node.properties.operation === "subtract" ? "selected" : ""}>Subtraktion (-)</option>
-                    <option value="multiply" ${node.properties.operation === "multiply" ? "selected" : ""}>Multiplikation (×)</option>
-                    <option value="divide" ${node.properties.operation === "divide" ? "selected" : ""}>Division (÷)</option>
-                </select>
-                
-                <div style="margin-top: 15px; text-align: center;">
-                    <div style="font-size: 18px; font-weight: bold; color: #9B59B6;">
-                        A <span id="operation-symbol">+</span> B
+            <div class="property formula-editor ${!node.properties.useCustomFormula ? 'active' : ''}" id="standard-operations" ${node.properties.useCustomFormula ? 'style="display:none;"' : ''}>
+                <label>Wählen Sie eine Operation:</label>
+                <div class="operation-grid">
+                    <div class="operation-option ${node.properties.operation === "add" ? 'selected' : ''}" data-operation="add">
+                        <div class="operation-symbol">+</div>
+                        <div class="operation-name">Addition</div>
+                    </div>
+                    <div class="operation-option ${node.properties.operation === "subtract" ? 'selected' : ''}" data-operation="subtract">
+                        <div class="operation-symbol">−</div>
+                        <div class="operation-name">Subtraktion</div>
+                    </div>
+                    <div class="operation-option ${node.properties.operation === "multiply" ? 'selected' : ''}" data-operation="multiply">
+                        <div class="operation-symbol">×</div>
+                        <div class="operation-name">Multiplikation</div>
+                    </div>
+                    <div class="operation-option ${node.properties.operation === "divide" ? 'selected' : ''}" data-operation="divide">
+                        <div class="operation-symbol">÷</div>
+                        <div class="operation-name">Division</div>
                     </div>
                 </div>
+                <div class="formula-preview" id="operation-preview">
+                    A ${getOperationSymbol(node.properties.operation)} B
+                </div>
             </div>
             
-            <div class="property formula-editor" id="custom-formula" ${!node.properties.useCustomFormula ? 'style="display:none;"' : ''}>
-                <label>Formel (verwende a und b als Variablen):</label>
-                <input type="text" id="prop-customFormula" class="formula-input" value="${node.properties.customFormula || ''}" placeholder="z.B.: a * b + 10">
-                <small>
-                    <strong>Beispiele:</strong><br>
-                    • Einfache Operationen: <code>a + b</code>, <code>a * b</code><br>
-                    • Mathematische Funktionen: <code>Math.sin(a)</code>, <code>Math.sqrt(a)</code><br>
-                    • Bedingte Ausdrücke: <code>a > b ? a : b</code> (Maximum)<br>
-                    • Komplexe Formeln: <code>Math.pow(a, 2) + Math.pow(b, 2)</code>
-                </small>
+            <div class="property formula-editor ${node.properties.useCustomFormula ? 'active' : ''}" id="custom-formula" ${!node.properties.useCustomFormula ? 'style="display:none;"' : ''}>
+                <label>Benutzerdefinierte Formel:</label>
+                <textarea id="prop-customFormula" class="formula-input" placeholder="z.B.: a * b + 10">${node.properties.customFormula || ''}</textarea>
+                <div class="formula-validation" id="formula-validation"></div>
+                <div class="formula-examples">
+                    <div class="formula-examples-title">💡 Beispiele und Funktionen:</div>
+                    • Grundoperationen: <code>a + b</code>, <code>a * b</code>, <code>a - b</code>, <code>a / b</code><br>
+                    • Mathematik: <code>Math.sqrt(a)</code>, <code>Math.sin(a)</code>, <code>Math.pow(a, 2)</code><br>
+                    • Bedingt: <code>a > b ? a : b</code> (Maximum)<br>
+                    • Konstanten: <code>Math.PI</code>, <code>Math.E</code><br>
+                    • Komplex: <code>(a + b) * Math.sqrt(a * b)</code>
+                </div>
             </div>
         `;
     } else if (node.constructor.name === "AlarmNode") {
@@ -530,42 +576,131 @@ function showNodeProperties(node) {
     
     // Zusätzliche Event-Listener für spezielle Elemente
     if (node.constructor.name === "FormulaNode") {
-        // Event-Listener für den Wechsel zwischen Standard-Operationen und benutzerdefinierten Formeln
-        const useCustomFormulaCheckbox = document.getElementById("prop-useCustomFormula");
+        // Event-Listener für die Formel-Modus-Buttons
+        const modeButtons = document.querySelectorAll(".formula-mode-btn");
         const standardOperations = document.getElementById("standard-operations");
         const customFormula = document.getElementById("custom-formula");
-        const operationSelect = document.getElementById("prop-operation");
-        const operationSymbol = document.getElementById("operation-symbol");
+        const operationOptions = document.querySelectorAll(".operation-option");
+        const operationPreview = document.getElementById("operation-preview");
+        const customFormulaInput = document.getElementById("prop-customFormula");
+        const formulaValidation = document.getElementById("formula-validation");
         
-        if (useCustomFormulaCheckbox) {
-            useCustomFormulaCheckbox.addEventListener("change", function() {
-                if (this.checked) {
+        // Mode-Button Event-Listener
+        modeButtons.forEach(button => {
+            button.addEventListener("click", function() {
+                const mode = this.dataset.mode;
+                const isCustom = mode === "custom";
+                
+                // Update button states
+                modeButtons.forEach(btn => btn.classList.remove("active"));
+                this.classList.add("active");
+                
+                // Update panel visibility and state
+                if (isCustom) {
                     standardOperations.style.display = "none";
                     customFormula.style.display = "block";
+                    customFormula.classList.add("active");
+                    standardOperations.classList.remove("active");
                 } else {
                     standardOperations.style.display = "block";
                     customFormula.style.display = "none";
+                    standardOperations.classList.add("active");
+                    customFormula.classList.remove("active");
                 }
+                
+                // Update node properties immediately
+                node.properties.useCustomFormula = isCustom;
+                graph.setDirtyCanvas(true);
+                
+                // Visual feedback for update
+                showUpdateFeedback();
+            });
+        });
+        
+        // Operation-Button Event-Listener
+        operationOptions.forEach(option => {
+            option.addEventListener("click", function() {
+                const operation = this.dataset.operation;
+                
+                // Update selection state
+                operationOptions.forEach(opt => opt.classList.remove("selected"));
+                this.classList.add("selected");
+                
+                // Update preview
+                operationPreview.textContent = `A ${getOperationSymbol(operation)} B`;
+                
+                // Update node properties immediately
+                node.properties.operation = operation;
+                graph.setDirtyCanvas(true);
+                
+                // Visual feedback for update
+                showUpdateFeedback();
+            });
+        });
+        
+        // Helper function for visual update feedback
+        function showUpdateFeedback() {
+            const formulaEditors = document.querySelectorAll(".formula-editor");
+            formulaEditors.forEach(editor => {
+                editor.classList.add("updating");
+                setTimeout(() => {
+                    editor.classList.remove("updating");
+                }, 500);
             });
         }
         
-        // Aktualisiere das Operationssymbol, wenn sich die Operation ändert
-        if (operationSelect && operationSymbol) {
-            // Setze das initiale Symbol
-            updateOperationSymbol(operationSelect.value);
-            
-            operationSelect.addEventListener("change", function() {
-                updateOperationSymbol(this.value);
-            });
-        }
-        
-        function updateOperationSymbol(operation) {
-            switch(operation) {
-                case "add": operationSymbol.textContent = "+"; break;
-                case "subtract": operationSymbol.textContent = "-"; break;
-                case "multiply": operationSymbol.textContent = "×"; break;
-                case "divide": operationSymbol.textContent = "÷"; break;
+        // Custom formula validation and live updates
+        if (customFormulaInput) {
+            function validateFormula(formula) {
+                if (!formula.trim()) {
+                    return { valid: true, message: "" };
+                }
+                
+                try {
+                    // Test the formula with sample values
+                    const testFn = new Function('a', 'b', 'return ' + formula);
+                    const result = testFn(10, 5);
+                    
+                    if (isNaN(result) || !isFinite(result)) {
+                        return { valid: false, message: "Formel gibt ungültigen Wert zurück" };
+                    }
+                    
+                    return { valid: true, message: `✓ Gültige Formel (Beispiel: 10, 5 → ${result})` };
+                } catch (error) {
+                    return { valid: false, message: `Syntaxfehler: ${error.message}` };
+                }
             }
+            
+            function updateValidation() {
+                const formula = customFormulaInput.value;
+                const validation = validateFormula(formula);
+                
+                // Update input styling
+                customFormulaInput.classList.remove("error");
+                if (!validation.valid && formula.trim()) {
+                    customFormulaInput.classList.add("error");
+                }
+                
+                // Update validation message
+                formulaValidation.className = "formula-validation";
+                if (validation.message) {
+                    formulaValidation.className += validation.valid ? " success" : " error";
+                    formulaValidation.textContent = validation.message;
+                } else {
+                    formulaValidation.style.display = "none";
+                }
+                
+                // Update node properties
+                node.properties.customFormula = formula;
+                graph.setDirtyCanvas(true);
+            }
+            
+            // Live validation as user types
+            customFormulaInput.addEventListener("input", updateValidation);
+            customFormulaInput.addEventListener("blur", updateValidation);
+            
+            // Initial validation
+            updateValidation();
         }
     } else if (node.constructor.name === "AlarmNode") {
         // Event-Listener für den Schwellwert-Slider
@@ -615,11 +750,14 @@ function showNodeProperties(node) {
             node.properties.precision = parseInt(document.getElementById("prop-precision").value);
             node.properties.showGraph = document.getElementById("prop-showGraph").checked;
         } else if (node.constructor.name === "FormulaNode") {
-            node.properties.useCustomFormula = document.getElementById("prop-useCustomFormula").checked;
-            if (node.properties.useCustomFormula) {
-                node.properties.customFormula = document.getElementById("prop-customFormula").value;
-            } else {
-                node.properties.operation = document.getElementById("prop-operation").value;
+            // Properties are already updated in real-time, but we'll refresh them here for confirmation
+            const customFormulaInput = document.getElementById("prop-customFormula");
+            const selectedOperation = document.querySelector(".operation-option.selected");
+            
+            if (customFormulaInput && node.properties.useCustomFormula) {
+                node.properties.customFormula = customFormulaInput.value;
+            } else if (selectedOperation) {
+                node.properties.operation = selectedOperation.dataset.operation;
             }
         } else if (node.constructor.name === "AlarmNode") {
             node.properties.threshold = parseFloat(document.getElementById("prop-threshold").value);

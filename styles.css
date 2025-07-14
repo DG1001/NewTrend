@@ -187,18 +187,240 @@ main {
 
 /* Formula editor styling */
 .formula-editor {
-    background-color: #f0f0f0;
+    background-color: #f8f9fa;
+    border: 1px solid #e3e6ea;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 12px;
+    transition: all 0.2s ease;
+}
+
+.formula-editor.active {
+    background-color: #f3e5f5;
+    border-color: #9B59B6;
+    box-shadow: 0 0 0 2px rgba(155, 89, 182, 0.1);
+}
+
+.formula-mode-selector {
+    display: flex;
+    background-color: #e9ecef;
+    border-radius: 6px;
+    padding: 2px;
+    margin-bottom: 16px;
+}
+
+.formula-mode-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    color: #6c757d;
+}
+
+.formula-mode-btn.active {
+    background-color: #9B59B6;
+    color: white;
+    box-shadow: 0 2px 4px rgba(155, 89, 182, 0.3);
+}
+
+.formula-mode-btn:hover:not(.active) {
+    background-color: #dee2e6;
+    color: #495057;
+}
+
+.operation-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.operation-option {
+    padding: 12px;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: white;
+}
+
+.operation-option.selected {
+    border-color: #9B59B6;
+    background-color: #f3e5f5;
+    color: #9B59B6;
+}
+
+.operation-option:hover:not(.selected) {
+    border-color: #adb5bd;
+    background-color: #f8f9fa;
+}
+
+.operation-symbol {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.operation-name {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.formula-preview {
+    background-color: white;
+    border: 1px solid #dee2e6;
     border-radius: 6px;
     padding: 12px;
-    margin-top: 10px;
+    text-align: center;
+    font-family: 'Consolas', monospace;
+    font-size: 16px;
+    color: #9B59B6;
+    font-weight: bold;
+    margin-top: 12px;
 }
 
 .formula-editor .formula-input {
     font-family: 'Consolas', monospace;
     background-color: #fff;
-    padding: 8px;
-    border: 1px solid #ccc;
+    padding: 12px;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+    resize: vertical;
+    min-height: 40px;
+}
+
+.formula-editor .formula-input:focus {
+    border-color: #9B59B6;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.1);
+}
+
+.formula-editor .formula-input.error {
+    border-color: #dc3545;
+    background-color: #fff5f5;
+}
+
+.formula-examples {
+    background-color: #e8f4fd;
+    border: 1px solid #b3d4fc;
+    border-radius: 6px;
+    padding: 12px;
+    margin-top: 12px;
+}
+
+.formula-examples-title {
+    font-weight: 600;
+    color: #0066cc;
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+
+.formula-examples code {
+    background-color: rgba(0, 102, 204, 0.1);
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: 'Consolas', monospace;
+    font-size: 12px;
+    color: #0066cc;
+}
+
+.formula-validation {
+    margin-top: 8px;
+    padding: 8px 12px;
     border-radius: 4px;
+    font-size: 13px;
+    display: none;
+}
+
+.formula-validation.success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+    display: block;
+}
+
+.formula-validation.error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    display: block;
+}
+
+/* Enhanced animations and transitions */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.formula-editor {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.operation-option:active {
+    animation: pulse 0.2s ease-out;
+}
+
+.formula-mode-btn.active {
+    animation: pulse 0.3s ease-out;
+}
+
+.formula-validation.success {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.formula-validation.error {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Improved focus states */
+.formula-mode-btn:focus,
+.operation-option:focus {
+    outline: 2px solid #9B59B6;
+    outline-offset: 2px;
+}
+
+/* Better visual hierarchy */
+.formula-editor .property label {
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* Real-time update indicator */
+.formula-editor.updating {
+    border-color: #28a745;
+    box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.2);
+}
+
+/* Improved responsiveness */
+@media (max-width: 400px) {
+    .operation-grid {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+    
+    .formula-mode-selector {
+        flex-direction: column;
+        gap: 2px;
+    }
+    
+    .formula-mode-btn {
+        padding: 10px 12px;
+    }
 }
 
 /* Alarm threshold styling */
