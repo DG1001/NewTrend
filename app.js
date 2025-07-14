@@ -56,6 +56,86 @@ function initGraph() {
         }
         return result;
     };
+    
+    // Completely disable LiteGraph's default property panel
+    canvas.allow_interaction = true;
+    canvas.allow_dragcanvas = true;
+    canvas.allow_dragnodes = true;
+    canvas.allow_reconnect_links = true;
+    
+    // Override the context menu to prevent default properties from showing
+    const originalGetCanvasMenuOptions = canvas.getCanvasMenuOptions;
+    canvas.getCanvasMenuOptions = function() {
+        const options = originalGetCanvasMenuOptions ? originalGetCanvasMenuOptions.call(this) : [];
+        // Remove any "Properties" options from the canvas menu
+        return options.filter(option => !option || option.content !== "Properties");
+    };
+    
+    // Override node context menu to redirect properties to our panel
+    const originalGetNodeMenuOptions = canvas.getNodeMenuOptions;
+    canvas.getNodeMenuOptions = function(node) {
+        return [
+            {
+                content: "Properties",
+                callback: () => {
+                    canvas.selectNode(node);
+                    showNodeProperties(node);
+                }
+            },
+            null,
+            {
+                content: "Clone",
+                callback: () => {
+                    const cloned = LiteGraph.createNode(node.constructor.type || node.type);
+                    if (cloned) {
+                        cloned.pos = [node.pos[0] + 30, node.pos[1] + 30];
+                        for (let i in node.properties) {
+                            cloned.properties[i] = node.properties[i];
+                        }
+                        graph.add(cloned);
+                    }
+                }
+            },
+            {
+                content: "Remove",
+                callback: () => {
+                    graph.remove(node);
+                }
+            }
+        ];
+    };
+    
+    // Disable LiteGraph's automatic property panel creation completely
+    const originalShowNodePanel = canvas.showNodePanel;
+    canvas.showNodePanel = function(node) {
+        // Instead of showing the default panel, use our custom one
+        if (node) {
+            this.selectNode(node);
+            showNodeProperties(node);
+        }
+        return false; // Prevent default behavior
+    };
+    
+    // Override processContextMenu to prevent default property panels
+    const originalProcessContextMenu = canvas.processContextMenu;
+    canvas.processContextMenu = function(node, event) {
+        if (node) {
+            // Show our custom context menu
+            const menu_options = this.getNodeMenuOptions(node);
+            if (menu_options) {
+                const menu = new LiteGraph.ContextMenu(menu_options, {
+                    event: event,
+                    callback: null,
+                    parentMenu: null,
+                    ignore_item_callbacks: false,
+                    title: node.constructor.title || "Node"
+                });
+                return false;
+            }
+        }
+        // For canvas context menu, use default behavior
+        return originalProcessContextMenu ? originalProcessContextMenu.call(this, node, event) : true;
+    };
 }
 
 // Event-Listener einrichten
