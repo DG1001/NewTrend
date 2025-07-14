@@ -6,7 +6,7 @@ A web-based visual node editor for creating sensor monitoring and data processin
 
 - **Visual Node Editor**: Drag-and-drop interface powered by LiteGraph.js
 - **Real-time Simulation**: Live sensor data generation and processing
-- **Comprehensive Node Library** (14 node types):
+- **Comprehensive Node Library** (17 node types):
   
   **Data Sources & Display:**
   - 🌡️ **Sensor Nodes**: Temperature, humidity, pressure, flow, and custom ranges
@@ -17,6 +17,11 @@ A web-based visual node editor for creating sensor monitoring and data processin
   - 🔍 **Filter Nodes**: Moving average, median, and low-pass filtering
   - 📈 **Statistics Nodes**: Real-time min/max/average calculations
   - 🧮 **Formula Nodes**: Mathematical operations and custom JavaScript formulas
+  
+  **Enhanced Visualization:**
+  - 📊 **Gauge Nodes**: Analog-style circular gauges with color-coded warning zones
+  - 📈 **Chart Nodes**: Time-series line charts with multi-trace support and auto-scaling
+  - 💡 **LED Indicators**: Multi-state visual status indicators with blinking effects
   
   **Logic & Control:**
   - ⚡ **Logic Gates**: AND, OR, NOT gates with expandable inputs
@@ -52,11 +57,19 @@ A web-based visual node editor for creating sensor monitoring and data processin
 
 ### Creating a Basic Flow
 
-1. **Add a Sensor**: Click "Sensor hinzufügen" to create a data source
-2. **Add a Display**: Click "Anzeige hinzufügen" to visualize the data
-3. **Connect Them**: Drag from the sensor's output port to the display's input port
-4. **Configure**: Select each node to customize properties
-5. **Simulate**: Click "Simulation starten" to see live data
+1. **Add a Sensor**: Click "Sensor" to create a data source
+2. **Add Visualization**: Click "Gauge", "Chart", or "Anzeige" to visualize the data
+3. **Connect Them**: Drag from the sensor's output port to the visualization's input port
+4. **Configure**: Select each node to customize properties in the right panel
+5. **Simulate**: Click "Simulation starten" to see live data with real-time updates
+
+### Building Advanced Monitoring Systems
+
+1. **Industrial Dashboard**: Combine Gauge nodes for pressure/temperature monitoring
+2. **Trend Analysis**: Use Chart nodes to track multiple sensors over time
+3. **Alarm Systems**: Connect LED indicators to Comparator nodes for visual alerts
+4. **Process Control**: Implement PID controllers with real-time feedback loops
+5. **Data Processing**: Chain Filter and Statistics nodes for signal conditioning
 
 ### Advanced Features
 
@@ -67,6 +80,9 @@ A web-based visual node editor for creating sensor monitoring and data processin
 - **Event Counting**: Edge-triggered counters with configurable thresholds
 - **Multi-output Comparison**: Three-way comparisons with tolerance settings
 - **Timer Operations**: Interval-based and timeout control systems
+- **Professional Visualization**: Industrial-grade gauges, real-time charts, and status indicators
+- **Time-series Analysis**: Configurable time windows with automatic data history management
+- **Visual Status Feedback**: Color-coded indicators with blinking alarms and smooth animations
 - **Custom Sensor Ranges**: Define min/max values for realistic simulations
 - **Graph Visualization**: Enable mini-graphs in display nodes for trend analysis
 
@@ -93,10 +109,12 @@ This is a client-side only application with no backend dependencies. All simulat
 
 ### Key Components
 
-- **Node System**: Custom node types extending LiteGraph.LGraphNode
-- **Simulation Engine**: 100ms interval-based real-time updates
-- **Property Management**: Dynamic UI generation based on node selection
-- **Visual Feedback**: Animated buttons and status indicators
+- **Node System**: 17 custom node types extending LiteGraph.LGraphNode
+- **Simulation Engine**: 100ms interval-based real-time updates with time tracking
+- **Property Management**: Dynamic UI generation with color-coded panels
+- **Visualization Engine**: Canvas-based rendering for gauges, charts, and indicators
+- **Data Management**: Efficient time-series storage with automatic cleanup
+- **Visual Feedback**: Smooth animations, blinking effects, and status indicators
 
 ## Browser Compatibility
 
