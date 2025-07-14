@@ -6,11 +6,28 @@ A web-based visual node editor for creating sensor monitoring and data processin
 
 - **Visual Node Editor**: Drag-and-drop interface powered by LiteGraph.js
 - **Real-time Simulation**: Live sensor data generation and processing
-- **Multiple Node Types**:
+- **Comprehensive Node Library** (14 node types):
+  
+  **Data Sources & Display:**
   - 🌡️ **Sensor Nodes**: Temperature, humidity, pressure, flow, and custom ranges
   - 📊 **Display Nodes**: Real-time values with optional mini-graphs
+  - 🔢 **Constant Nodes**: Fixed value sources for calculations
+  
+  **Processing & Analysis:**
+  - 🔍 **Filter Nodes**: Moving average, median, and low-pass filtering
+  - 📈 **Statistics Nodes**: Real-time min/max/average calculations
   - 🧮 **Formula Nodes**: Mathematical operations and custom JavaScript formulas
+  
+  **Logic & Control:**
+  - ⚡ **Logic Gates**: AND, OR, NOT gates with expandable inputs
+  - ⚖️ **Comparator Nodes**: Three-output comparison (greater, equal, less)
+  - 🔢 **Counter Nodes**: Edge-triggered counting with overflow detection
+  
+  **Automation & Monitoring:**
+  - ⏱️ **Timer Nodes**: Interval and timeout-based operations
+  - 🎛️ **PID Controller**: Full industrial automation control
   - 🚨 **Alarm Nodes**: Threshold-based alerting system
+
 - **Interactive Properties Panel**: Configure node settings in real-time
 - **Simulation Controls**: Start/stop data generation with timing display
 
@@ -44,7 +61,12 @@ A web-based visual node editor for creating sensor monitoring and data processin
 ### Advanced Features
 
 - **Custom Formulas**: Use JavaScript expressions like `a * b + 10` or `Math.sin(a)`
-- **Alarm Conditions**: Set thresholds with greater-than or less-than conditions
+- **Logic Gate Operations**: Expandable inputs for complex boolean logic
+- **PID Control**: Proportional-Integral-Derivative control with tunable parameters
+- **Statistical Analysis**: Real-time data filtering and statistical calculations
+- **Event Counting**: Edge-triggered counters with configurable thresholds
+- **Multi-output Comparison**: Three-way comparisons with tolerance settings
+- **Timer Operations**: Interval-based and timeout control systems
 - **Custom Sensor Ranges**: Define min/max values for realistic simulations
 - **Graph Visualization**: Enable mini-graphs in display nodes for trend analysis
 
