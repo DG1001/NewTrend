@@ -251,6 +251,12 @@ This project is licensed under the Kirsten Controls Non-Commercial License.
 
 See the [LICENSE](LICENSE) file for full license terms.
 
+### Third-Party Libraries
+
+This project uses several open source libraries (LiteGraph.js, MQTT.js, Blockly, Font Awesome) that are licensed under permissive open source licenses (MIT, Apache 2.0, CC BY 4.0, SIL OFL). These libraries can be used commercially and are not subject to the commercial restrictions of this project.
+
+See [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) for complete attribution and license information.
+
 ## Contact
 
 For questions or support regarding this technical preview prototype, please contact the Kirsten Controls development team.
