@@ -104,9 +104,6 @@ A web-based visual node editor for creating sensor monitoring and data processin
 
 ```
 ├── index.html              # Main application layout and HTML structure
-├── app.js                  # Core application logic (monolithic bundle for deployment)
-├── app-minimal.js          # Minimal build without legacy support
-├── app-legacy.js           # Legacy browser support build
 ├── styles.css              # All CSS styles for the application
 ├── js/                       # Modular JavaScript source code
 │   ├── main.js             # Main entry point, initializes the application
