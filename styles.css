@@ -596,6 +596,10 @@ footer {
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    position: relative;
+    resize: both;
+    min-width: 400px;
+    min-height: 300px;
 }
 
 .modal-header {
@@ -627,6 +631,27 @@ footer {
     flex: 1;
     overflow-y: auto;
     max-height: 400px;
+}
+
+/* Resizable Blockly Modal Styles */
+.modal-content.resizable {
+    resize: both;
+    min-width: 600px;
+    min-height: 400px;
+    max-width: 95vw;
+    max-height: 95vh;
+    width: 80vw;
+    height: 70vh;
+}
+
+.modal-content.resizable .modal-body {
+    max-height: none;
+    height: calc(100% - 120px); /* Subtract header and footer height */
+    overflow: hidden;
+}
+
+.modal-content.resizable .modal-body > div {
+    height: 100% !important;
 }
 
 .modal-footer {

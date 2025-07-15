@@ -19,13 +19,13 @@ const BlocklyHelper = {
         this.editorDivId = 'blockly-div-' + Date.now();
         const editorHTML = `
             <div id="blockly-editor" class="modal" style="display: flex;">
-                <div class="modal-content">
+                <div class="modal-content resizable">
                     <div class="modal-header">
                         <h3>Blockly Editor</h3>
                         <span class="modal-close" id="blockly-close">&times;</span>
                     </div>
                     <div class="modal-body">
-                        <div id="${this.editorDivId}" style="height: 480px; width: 100%;"></div>
+                        <div id="${this.editorDivId}" style="height: 100%; width: 100%;"></div>
                     </div>
                     <div class="modal-footer">
                         <button id="blockly-save" class="btn btn-primary">Save</button>
@@ -57,6 +57,9 @@ const BlocklyHelper = {
         
         // Add escape key handler
         document.addEventListener('keydown', this.escapeHandler);
+        
+        // Add resize observer to update Blockly when modal is resized
+        this.setupResizeObserver();
     },
 
     cleanupExistingModal() {
@@ -150,6 +153,32 @@ const BlocklyHelper = {
         this.closeHandler = null;
         this.saveHandler = null;
         this.currentNode = null;
+        
+        // Clean up resize observer
+        if (this.resizeObserver) {
+            this.resizeObserver.disconnect();
+            this.resizeObserver = null;
+        }
+    },
+    
+    setupResizeObserver() {
+        if (!window.ResizeObserver) {
+            return; // Skip if ResizeObserver is not supported
+        }
+        
+        this.resizeObserver = new ResizeObserver(() => {
+            if (this.workspace) {
+                // Small delay to ensure DOM has updated
+                setTimeout(() => {
+                    Blockly.svgResize(this.workspace);
+                }, 10);
+            }
+        });
+        
+        const modalContent = document.querySelector('#blockly-editor .modal-content');
+        if (modalContent) {
+            this.resizeObserver.observe(modalContent);
+        }
     }
 };
 
