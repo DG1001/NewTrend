@@ -17,49 +17,84 @@
     <header>
         <h1>Trendows Web Prototyp</h1>
         <div class="toolbar">
-            <!-- Data Sources & Display -->
-            <button id="add-sensor"><i class="fas fa-thermometer-half"></i> Sensor</button>
-            <button id="add-display"><i class="fas fa-chart-line"></i> Anzeige</button>
-            <button id="add-constant"><i class="fas fa-hashtag"></i> Konstante</button>
-            <button id="add-button"><i class="fas fa-mouse-pointer"></i> Button</button>
-            <button id="add-switch"><i class="fas fa-toggle-on"></i> Switch</button>
-            <button id="add-slider"><i class="fas fa-sliders-h"></i> Slider</button>
-            <button id="add-mqtt"><i class="fas fa-wifi"></i> MQTT</button>
-            <button id="add-mqttsend"><i class="fas fa-paper-plane"></i> MQTT Send</button>
+            <!-- Data Sources & Input -->
+            <div class="toolbar-group">
+                <span class="group-label">Eingabe</span>
+                <div class="group-buttons">
+                    <button id="add-sensor"><i class="fas fa-thermometer-half"></i> Sensor</button>
+                    <button id="add-constant"><i class="fas fa-hashtag"></i> Konstante</button>
+                    <button id="add-button"><i class="fas fa-mouse-pointer"></i> Button</button>
+                    <button id="add-switch"><i class="fas fa-toggle-on"></i> Switch</button>
+                    <button id="add-slider"><i class="fas fa-sliders-h"></i> Slider</button>
+                    <button id="add-mqtt"><i class="fas fa-wifi"></i> MQTT</button>
+                </div>
+            </div>
             
             <!-- Processing & Analysis -->
-            <button id="add-filter"><i class="fas fa-filter"></i> Filter</button>
-            <button id="add-statistics"><i class="fas fa-chart-bar"></i> Statistik</button>
-            <button id="add-formula"><i class="fas fa-calculator"></i> Formel</button>
-            <button id="add-fft"><i class="fas fa-wave-square"></i> FFT</button>
-            <button id="add-compute"><i class="fas fa-microchip"></i> Compute</button>
-            
-            <!-- Visualization -->
-            <button id="add-gauge"><i class="fas fa-tachometer-alt"></i> Gauge</button>
-            <button id="add-chart"><i class="fas fa-chart-area"></i> Chart</button>
-            <button id="add-led"><i class="fas fa-lightbulb"></i> LED</button>
+            <div class="toolbar-group">
+                <span class="group-label">Verarbeitung</span>
+                <div class="group-buttons">
+                    <button id="add-filter"><i class="fas fa-filter"></i> Filter</button>
+                    <button id="add-statistics"><i class="fas fa-chart-bar"></i> Statistik</button>
+                    <button id="add-formula"><i class="fas fa-calculator"></i> Formel</button>
+                    <button id="add-fft"><i class="fas fa-wave-square"></i> FFT</button>
+                    <button id="add-compute"><i class="fas fa-microchip"></i> Compute</button>
+                </div>
+            </div>
             
             <!-- Logic & Control -->
-            <button id="add-and"><i class="fas fa-square"></i> AND</button>
-            <button id="add-or"><i class="fas fa-circle"></i> OR</button>
-            <button id="add-not"><i class="fas fa-exclamation"></i> NOT</button>
-            <button id="add-comparator"><i class="fas fa-not-equal"></i> Vergleich</button>
-            <button id="add-counter"><i class="fas fa-sort-numeric-up"></i> Zähler</button>
+            <div class="toolbar-group">
+                <span class="group-label">Logik</span>
+                <div class="group-buttons">
+                    <button id="add-and"><i class="fas fa-square"></i> AND</button>
+                    <button id="add-or"><i class="fas fa-circle"></i> OR</button>
+                    <button id="add-not"><i class="fas fa-exclamation"></i> NOT</button>
+                    <button id="add-comparator"><i class="fas fa-not-equal"></i> Vergleich</button>
+                    <button id="add-counter"><i class="fas fa-sort-numeric-up"></i> Zähler</button>
+                </div>
+            </div>
             
-            <!-- Automation -->
-            <button id="add-timer"><i class="fas fa-clock"></i> Timer</button>
-            <button id="add-pid"><i class="fas fa-cogs"></i> PID Regler</button>
-            <button id="add-alarm"><i class="fas fa-bell"></i> Alarm</button>
+            <!-- Visualization & Display -->
+            <div class="toolbar-group">
+                <span class="group-label">Anzeige</span>
+                <div class="group-buttons">
+                    <button id="add-display"><i class="fas fa-chart-line"></i> Anzeige</button>
+                    <button id="add-gauge"><i class="fas fa-tachometer-alt"></i> Gauge</button>
+                    <button id="add-chart"><i class="fas fa-chart-area"></i> Chart</button>
+                    <button id="add-led"><i class="fas fa-lightbulb"></i> LED</button>
+                </div>
+            </div>
+            
+            <!-- Automation & Control -->
+            <div class="toolbar-group">
+                <span class="group-label">Automation</span>
+                <div class="group-buttons">
+                    <button id="add-timer"><i class="fas fa-clock"></i> Timer</button>
+                    <button id="add-pid"><i class="fas fa-cogs"></i> PID Regler</button>
+                    <button id="add-alarm"><i class="fas fa-bell"></i> Alarm</button>
+                    <button id="add-mqttsend"><i class="fas fa-paper-plane"></i> MQTT Send</button>
+                </div>
+            </div>
             
             <!-- File Operations -->
-            <button id="save-graph"><i class="fas fa-save"></i> Speichern</button>
-            <button id="load-graph"><i class="fas fa-folder-open"></i> Laden</button>
-            <button id="export-graph"><i class="fas fa-download"></i> Export</button>
-            <button id="import-graph"><i class="fas fa-upload"></i> Import</button>
+            <div class="toolbar-group">
+                <span class="group-label">Datei</span>
+                <div class="group-buttons">
+                    <button id="save-graph"><i class="fas fa-save"></i> Speichern</button>
+                    <button id="load-graph"><i class="fas fa-folder-open"></i> Laden</button>
+                    <button id="export-graph"><i class="fas fa-download"></i> Export</button>
+                    <button id="import-graph"><i class="fas fa-upload"></i> Import</button>
+                </div>
+            </div>
             
-            <!-- Simulation -->
-            <button id="start-sim"><i class="fas fa-play"></i> Simulation starten</button>
-            <button id="stop-sim"><i class="fas fa-stop"></i> Simulation stoppen</button>
+            <!-- Simulation Controls -->
+            <div class="toolbar-group">
+                <span class="group-label">Simulation</span>
+                <div class="group-buttons">
+                    <button id="start-sim"><i class="fas fa-play"></i> Starten</button>
+                    <button id="stop-sim"><i class="fas fa-stop"></i> Stoppen</button>
+                </div>
+            </div>
         </div>
     </header>
     
