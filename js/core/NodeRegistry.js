@@ -32,6 +32,7 @@ const NodeRegistry = {
         if (window.SwitchNode) this.register(SwitchNode, "trendows/switch");
         if (window.SliderNode) this.register(SliderNode, "trendows/slider");
         if (window.MQTTNode) this.register(MQTTNode, "trendows/mqtt");
+        if (window.MQTTSendNode) this.register(MQTTSendNode, "trendows/mqttsend");
         
         // Processing & Analysis
         if (window.FilterNode) this.register(FilterNode, "trendows/filter");

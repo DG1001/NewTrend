@@ -79,6 +79,10 @@ const ToolbarHelpers = {
         return this.createNode("trendows/mqtt", { x: 800, y: 500 }, "add-mqtt");
     },
     
+    createMQTTSendNode() {
+        return this.createNode("trendows/mqttsend", { x: 950, y: 500 }, "add-mqttsend");
+    },
+    
     createFormulaNode() {
         return this.createNode("trendows/formula", { x: 300, y: 300 }, "add-formula");
     },

@@ -133,6 +133,8 @@ const PropertyPanel = {
                 return this.generateFFTProperties(node);
             case 'MQTTNode':
                 return this.generateMQTTProperties(node);
+            case 'MQTTSendNode':
+                return this.generateMQTTSendProperties(node);
             default:
                 return '<div class="property"><p>No specific properties available for this node type.</p></div>';
         }
@@ -331,6 +333,9 @@ const PropertyPanel = {
                 break;
             case 'MQTTNode':
                 this.updateMQTTProperties(node);
+                break;
+            case 'MQTTSendNode':
+                this.updateMQTTSendProperties(node);
                 break;
         }
         
@@ -1021,6 +1026,102 @@ const PropertyPanel = {
             node.properties.topic = topicField.value;
             if (node.onPropertyChanged) {
                 node.onPropertyChanged('topic', topicField.value);
+            }
+        }
+    },
+    
+    // Generate MQTT Send properties
+    generateMQTTSendProperties(node) {
+        return `
+            <div class="property">
+                <label>Broker IP:</label>
+                <input type="text" id="prop-brokerIP" value="${node.properties.brokerIP}" placeholder="localhost">
+            </div>
+            <div class="property">
+                <label>MQTT Port:</label>
+                <input type="number" id="prop-brokerPort" value="${node.properties.brokerPort}" min="1" max="65535">
+                <small>Standard MQTT port (usually 1883)</small>
+            </div>
+            <div class="property">
+                <label>WebSocket Port:</label>
+                <input type="number" id="prop-wsPort" value="${node.properties.wsPort}" min="1" max="65535">
+                <small>MQTT WebSocket port (e.g., 1884, 9001, 8083)</small>
+            </div>
+            <div class="property">
+                <label>Topic:</label>
+                <input type="text" id="prop-topic" value="${node.properties.topic}" placeholder="sensors/output">
+            </div>
+            <div class="property">
+                <label>Send Mode:</label>
+                <select id="prop-sendOnChange">
+                    <option value="true" ${node.properties.sendOnChange ? "selected" : ""}>Send on value change</option>
+                    <option value="false" ${!node.properties.sendOnChange ? "selected" : ""}>Send at interval</option>
+                </select>
+            </div>
+            <div class="property">
+                <label>Send Interval (ms):</label>
+                <input type="number" id="prop-sendInterval" value="${node.properties.sendInterval}" min="100" max="60000" ${node.properties.sendOnChange ? 'disabled' : ''}>
+                <small>Only used when sending at interval</small>
+            </div>
+            <div class="property">
+                <label>Connection Status:</label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 12px; height: 12px; border-radius: 50%; background-color: ${node.connected ? '#2ECC71' : '#E74C3C'};"></div>
+                    <span style="font-size: 12px; color: #666;">${node.connected ? 'Connected' : 'Disconnected'}</span>
+                </div>
+            </div>
+            <div class="property">
+                <label>Last Message:</label>
+                <div style="font-size: 11px; color: #666; padding: 5px; background: #f9f9f9; border-radius: 3px;">
+                    ${node.lastMessage || 'No messages yet'}
+                </div>
+            </div>
+        `;
+    },
+    
+    // Update MQTT Send properties
+    updateMQTTSendProperties(node) {
+        const brokerIPField = document.getElementById("prop-brokerIP");
+        const brokerPortField = document.getElementById("prop-brokerPort");
+        const wsPortField = document.getElementById("prop-wsPort");
+        const topicField = document.getElementById("prop-topic");
+        const sendOnChangeField = document.getElementById("prop-sendOnChange");
+        const sendIntervalField = document.getElementById("prop-sendInterval");
+        
+        if (brokerIPField) {
+            node.properties.brokerIP = brokerIPField.value;
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('brokerIP', brokerIPField.value);
+            }
+        }
+        if (brokerPortField) {
+            node.properties.brokerPort = parseInt(brokerPortField.value);
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('brokerPort', parseInt(brokerPortField.value));
+            }
+        }
+        if (wsPortField) {
+            node.properties.wsPort = parseInt(wsPortField.value);
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('wsPort', parseInt(wsPortField.value));
+            }
+        }
+        if (topicField) {
+            node.properties.topic = topicField.value;
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('topic', topicField.value);
+            }
+        }
+        if (sendOnChangeField) {
+            node.properties.sendOnChange = sendOnChangeField.value === 'true';
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('sendOnChange', sendOnChangeField.value === 'true');
+            }
+        }
+        if (sendIntervalField) {
+            node.properties.sendInterval = parseInt(sendIntervalField.value);
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('sendInterval', parseInt(sendIntervalField.value));
             }
         }
     },
