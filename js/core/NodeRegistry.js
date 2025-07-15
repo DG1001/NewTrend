@@ -28,6 +28,7 @@ const NodeRegistry = {
         if (window.SensorNode) this.register(SensorNode, "trendows/sensor");
         if (window.DisplayNode) this.register(DisplayNode, "trendows/display");
         if (window.ConstantNode) this.register(ConstantNode, "trendows/constant");
+        if (window.ButtonNode) this.register(ButtonNode, "trendows/button");
         
         // Processing & Analysis
         if (window.FilterNode) this.register(FilterNode, "trendows/filter");

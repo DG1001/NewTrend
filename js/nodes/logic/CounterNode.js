@@ -15,8 +15,8 @@ class CounterNode extends BaseNode {
         this.size = [150, 70];
         this.color = "#D35400";
         this.count = 0;
-        this.lastTrigger = false;
         this.overflow = false;
+        this.lastTrigger = false;
     }
     
     getMenuOptions() {
@@ -43,6 +43,7 @@ class CounterNode extends BaseNode {
         if (reset) {
             this.count = 0;
             this.overflow = false;
+            this.lastTrigger = false;
         }
         
         // Trigger logic (edge detection)

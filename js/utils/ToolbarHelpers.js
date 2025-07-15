@@ -62,6 +62,10 @@ const ToolbarHelpers = {
     createConstantNode() {
         return this.createNode("trendows/constant", { x: 200, y: 500 }, "add-constant");
     },
+
+    createButtonNode() {
+        return this.createNode("trendows/button", { x: 350, y: 500 }, "add-button");
+    },
     
     createFormulaNode() {
         return this.createNode("trendows/formula", { x: 300, y: 300 }, "add-formula");

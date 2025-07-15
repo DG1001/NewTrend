@@ -123,6 +123,7 @@ const Application = {
             this.bindEvent("add-sensor", () => helpers.createSensorNode());
             this.bindEvent("add-display", () => helpers.createDisplayNode());
             this.bindEvent("add-constant", () => helpers.createConstantNode());
+            this.bindEvent("add-button", () => helpers.createButtonNode());
             
             // Processing & Analysis
             this.bindEvent("add-filter", () => helpers.createFilterNode());
