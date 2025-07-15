@@ -6,6 +6,7 @@ class ComputeNode extends BaseNode {
 
         this.properties.blocklyXML = '';
         this.properties.generatedCode = '';
+        this.globals = {}; // Initialize globals object
 
         this.addWidget('button', 'Open Editor', null, () => {
             this.openBlocklyEditor();
@@ -15,11 +16,11 @@ class ComputeNode extends BaseNode {
     onExecute() {
         if (this.properties.generatedCode) {
             try {
-                const func = new Function('inputs', 'outputs', this.properties.generatedCode);
+                const func = new Function('inputs', 'outputs', 'globals', this.properties.generatedCode);
                 const inputs = this.getInputs();
                 const outputs = {};
                 
-                func(inputs, outputs);
+                func(inputs, outputs, this.globals);
 
                 for (let i = 0; i < this.outputs.length; i++) {
                     if (outputs[i] !== undefined) {

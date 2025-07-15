@@ -9,6 +9,8 @@ const BlocklyHelper = {
     },
 
     showEditor() {
+        // Generate a unique ID for the Blockly container
+        this.editorDivId = 'blockly-div-' + Date.now();
         const editorHTML = `
             <div id="blockly-editor" class="modal" style="display: flex;">
                 <div class="modal-content">
@@ -17,7 +19,7 @@ const BlocklyHelper = {
                         <span class="modal-close" id="blockly-close">&times;</span>
                     </div>
                     <div class="modal-body">
-                        <div id="blockly-div" style="height: 480px; width: 100%;"></div>
+                        <div id="${this.editorDivId}" style="height: 480px; width: 100%;"></div>
                     </div>
                     <div class="modal-footer">
                         <button id="blockly-save" class="btn btn-primary">Save</button>
@@ -32,7 +34,7 @@ const BlocklyHelper = {
     },
 
     injectBlockly() {
-        const blocklyDiv = document.getElementById('blockly-div');
+        const blocklyDiv = document.getElementById(this.editorDivId);
         this.workspace = Blockly.inject(blocklyDiv, {
             toolbox: this.getToolbox()
         });
@@ -41,6 +43,7 @@ const BlocklyHelper = {
             this.workspace.clear();
             const xml = Blockly.Xml.textToDom(this.currentNode.properties.blocklyXML);
             Blockly.Xml.domToWorkspace(xml, this.workspace);
+            Blockly.svgResize(this.workspace);
         }
     },
 
@@ -64,6 +67,10 @@ const BlocklyHelper = {
                     <block type="get_input"></block>
                     <block type="set_output"></block>
                 </category>
+                <category name="Global Variables" colour="290">
+                    <block type="set_global_variable"></block>
+                    <block type="get_global_variable"></block>
+                </category>
             </xml>
         `;
     },
@@ -76,6 +83,10 @@ const BlocklyHelper = {
     },
 
     close() {
+        if (this.workspace) {
+            this.workspace.dispose();
+            this.workspace = null;
+        }
         const editor = document.getElementById('blockly-editor');
         if (editor) {
             editor.remove();
@@ -125,4 +136,45 @@ Blockly.JavaScript['set_output'] = function(block) {
   var value_value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_ATOMIC);
   var code = `outputs[${value_output_index} - 1] = ${value_value};\n`;
   return code;
+};
+
+Blockly.Blocks['set_global_variable'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("set global variable")
+        .appendField(new Blockly.FieldTextInput("var_name"), "VAR_NAME");
+    this.appendValueInput("VALUE")
+        .setCheck(null)
+        .appendField("to");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(290);
+    this.setTooltip("Sets the value of a global variable.");
+    this.setHelpUrl("");
+  }
+};
+
+Blockly.JavaScript['set_global_variable'] = function(block) {
+  var var_name = block.getFieldValue('VAR_NAME');
+  var value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_ATOMIC);
+  var code = `globals['${var_name}'] = ${value};\n`;
+  return code;
+};
+
+Blockly.Blocks['get_global_variable'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("get global variable")
+        .appendField(new Blockly.FieldTextInput("var_name"), "VAR_NAME");
+    this.setOutput(true, null);
+    this.setColour(290);
+    this.setTooltip("Gets the value of a global variable.");
+    this.setHelpUrl("");
+  }
+};
+
+Blockly.JavaScript['get_global_variable'] = function(block) {
+  var var_name = block.getFieldValue('VAR_NAME');
+  var code = `globals['${var_name}']`;
+  return [code, Blockly.JavaScript.ORDER_NONE];
 };
