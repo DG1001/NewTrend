@@ -4,6 +4,7 @@ class LedIndicatorNode extends BaseNode {
         super();
         this.title = "LED Indicator";
         this.addInput("State", "number");
+        this.addInput("Boolean", "boolean");
         this.properties = {
             states: [
                 { value: 0, color: "#95A5A6", label: "Off", blink: false },
@@ -53,9 +54,14 @@ class LedIndicatorNode extends BaseNode {
     }
     
     onExecute() {
-        const input = this.getInputData(0);
-        if (input !== undefined) {
-            this.currentState = Math.round(input);
+        const numberInput = this.getInputData(0);
+        const booleanInput = this.getInputData(1);
+        
+        // Boolean input takes priority
+        if (booleanInput !== undefined) {
+            this.currentState = booleanInput ? 1 : 0;
+        } else if (numberInput !== undefined) {
+            this.currentState = Math.round(numberInput);
         }
         
         // Update blink phase
