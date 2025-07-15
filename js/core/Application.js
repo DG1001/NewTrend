@@ -201,6 +201,7 @@ const Application = {
         }
     },
     
+    
     // Handle save graph
     handleSaveGraph() {
         this.showSaveModal();
@@ -475,7 +476,22 @@ const Application = {
                 firstInput.select();
             }
         }
+    },
+
+    resetCanvas() {
+        if (window.canvas) {
+            window.canvas.clear(); 
+        }
+
+        const canvasElement = document.getElementById("graph-canvas");
+        if (canvasElement) {
+            this.canvas = new LiteGraph.LGraphCanvas(canvasElement, this.graph);
+        } else {
+            console.error("Graph canvas element not found during reset!");
+        }
     }
+    
+    
 };
 
 // Make Application available globally

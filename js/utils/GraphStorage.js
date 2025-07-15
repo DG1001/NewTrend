@@ -23,7 +23,7 @@ const GraphStorage = {
         
         try {
             // Serialize the graph
-            const graphData = graph.serialize();
+            const graphData = window.graph.serialize();
             
             // Create metadata entry
             const timestamp = new Date().toISOString();
@@ -59,10 +59,9 @@ const GraphStorage = {
         }
     },
     
-    // Load a graph by ID
     loadGraph(graphId) {
-        if (!window.graph) {
-            throw new Error('No graph instance available');
+        if (!window.graph || !window.Application) {
+            throw new Error('Graph or Application instance not available');
         }
         
         try {
@@ -72,27 +71,27 @@ const GraphStorage = {
             }
             
             const graphData = JSON.parse(graphDataStr);
+
+            // Stop everything
+            if (window.SimulationEngine) SimulationEngine.stop();
+            window.graph.stop();
             
-            // Clear current graph
-            graph.clear();
+            // Clear data and reset canvas
+            window.graph.clear();
+            window.Application.resetCanvas();
             
-            // Load the saved graph
-            graph.configure(graphData);
-            
-            // Refresh canvas
+            // Configure and restart
+            window.graph.configure(graphData);
+            window.graph.start();
+            if (window.SimulationEngine) setTimeout(() => SimulationEngine.start(), 100);
+
             if (window.canvas) {
-                canvas.setDirty(true, true);
+                window.canvas.draw(true, true);
             }
-            
-            // Get metadata for success message
-            const metadata = this.getGraphList();
-            const graphInfo = metadata[graphId];
             
             return {
                 success: true,
-                message: `Graph "${graphInfo ? graphInfo.name : graphId}" loaded successfully`,
-                nodeCount: graphData.nodes ? graphData.nodes.length : 0,
-                linkCount: graphData.links ? graphData.links.length : 0
+                message: 'Graph loaded successfully'
             };
             
         } catch (error) {
@@ -143,7 +142,7 @@ const GraphStorage = {
         }
         
         try {
-            const graphData = graph.serialize();
+            const graphData = window.graph.serialize();
             const exportData = {
                 name: name,
                 timestamp: new Date().toISOString(),
@@ -178,42 +177,41 @@ const GraphStorage = {
         }
     },
     
-    // Import graph from JSON data
     importGraph(jsonData) {
-        if (!window.graph) {
-            throw new Error('No graph instance available');
+        if (!window.graph || !window.Application) {
+            throw new Error('Graph or Application instance not available');
         }
         
         try {
             let graphData;
-            
-            // Handle different import formats
             if (jsonData.graph) {
-                // Our export format
                 graphData = jsonData.graph;
             } else if (jsonData.nodes || jsonData.links) {
-                // Direct LiteGraph format
                 graphData = jsonData;
             } else {
                 throw new Error('Invalid graph format');
             }
+
+            // Stop everything
+            if (window.SimulationEngine) SimulationEngine.stop();
+            window.graph.stop();
             
-            // Clear current graph
-            graph.clear();
+            // Clear data and reset canvas
+            window.graph.clear();
+            window.Application.resetCanvas();
             
-            // Load the imported graph
-            graph.configure(graphData);
-            
-            // Refresh canvas
+            // Configure and restart
+            window.graph.configure(graphData);
+            window.graph.start();
+            if (window.SimulationEngine) setTimeout(() => SimulationEngine.start(), 100);
+
             if (window.canvas) {
-                canvas.setDirty(true, true);
+                window.canvas.draw(true, true);
             }
             
             return {
                 success: true,
-                message: 'Graph imported successfully',
-                nodeCount: graphData.nodes ? graphData.nodes.length : 0,
-                linkCount: graphData.links ? graphData.links.length : 0
+                message: 'Graph imported successfully'
             };
             
         } catch (error) {
@@ -291,7 +289,9 @@ const GraphStorage = {
         const sizes = ['B', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    }
+    },
+    
+    
 };
 
 // Make GraphStorage available globally
