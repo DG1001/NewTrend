@@ -46,6 +46,12 @@
             <button id="add-pid"><i class="fas fa-cogs"></i> PID Regler</button>
             <button id="add-alarm"><i class="fas fa-bell"></i> Alarm</button>
             
+            <!-- File Operations -->
+            <button id="save-graph"><i class="fas fa-save"></i> Speichern</button>
+            <button id="load-graph"><i class="fas fa-folder-open"></i> Laden</button>
+            <button id="export-graph"><i class="fas fa-download"></i> Export</button>
+            <button id="import-graph"><i class="fas fa-upload"></i> Import</button>
+            
             <!-- Simulation -->
             <button id="start-sim"><i class="fas fa-play"></i> Simulation starten</button>
             <button id="stop-sim"><i class="fas fa-stop"></i> Simulation stoppen</button>
@@ -55,6 +61,26 @@
     <main>
         <div id="canvas-container">
             <canvas id="graph-canvas"></canvas>
+        </div>
+        
+        <!-- Hidden file input for importing graphs -->
+        <input type="file" id="import-file-input" accept=".json" style="display: none;">
+        
+        <!-- Graph management modal -->
+        <div id="graph-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modal-title">Graph Management</h3>
+                    <span class="modal-close">&times;</span>
+                </div>
+                <div class="modal-body" id="modal-body">
+                    <!-- Content will be dynamically generated -->
+                </div>
+                <div class="modal-footer">
+                    <button id="modal-cancel" class="btn btn-secondary">Cancel</button>
+                    <button id="modal-action" class="btn btn-primary">Action</button>
+                </div>
+            </div>
         </div>
         
         <div id="properties-panel">
@@ -74,6 +100,7 @@
     <script src="js/utils/SensorData.js"></script>
     <script src="js/utils/ToolbarHelpers.js"></script>
     <script src="js/utils/FFTHelper.js"></script>
+    <script src="js/utils/GraphStorage.js"></script>
     
     <!-- Core modules -->
     <script src="js/core/NodeRegistry.js"></script>
