@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/litegraph.js@0.7.14/build/litegraph.min.js"></script>
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+            <script src="https://unpkg.com/blockly@9.2.0/blockly_compressed.js"></script>
+    <script src="https://unpkg.com/blockly@9.2.0/blocks_compressed.js"></script>
+    <script src="https://unpkg.com/blockly@9.2.0/javascript_compressed.js"></script>
+    <script src="https://unpkg.com/blockly@9.2.0/msg/en.js"></script>
 </head>
 <body>
     <header>
@@ -28,6 +32,7 @@
             <button id="add-statistics"><i class="fas fa-chart-bar"></i> Statistik</button>
             <button id="add-formula"><i class="fas fa-calculator"></i> Formel</button>
             <button id="add-fft"><i class="fas fa-wave-square"></i> FFT</button>
+            <button id="add-compute"><i class="fas fa-microchip"></i> Compute</button>
             
             <!-- Visualization -->
             <button id="add-gauge"><i class="fas fa-tachometer-alt"></i> Gauge</button>
@@ -101,6 +106,7 @@
     <script src="js/utils/ToolbarHelpers.js"></script>
     <script src="js/utils/FFTHelper.js"></script>
     <script src="js/utils/GraphStorage.js"></script>
+    <script src="js/utils/BlocklyHelper.js"></script>
     
     <!-- Core modules -->
     <script src="js/core/NodeRegistry.js"></script>
@@ -123,6 +129,7 @@
     <script src="js/nodes/processing/StatisticsNode.js"></script>
     <script src="js/nodes/processing/FormulaNode.js"></script>
     <script src="js/nodes/processing/FFTNode.js"></script>
+    <script src="js/nodes/processing/ComputeNode.js"></script>
     
     <!-- Node classes - Visualization -->
     <script src="js/nodes/visualization/GaugeNode.js"></script>

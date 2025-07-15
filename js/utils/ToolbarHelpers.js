@@ -88,7 +88,11 @@ const ToolbarHelpers = {
     },
     
     createFFTNode() {
-        return this.createNode("trendows/fft", { x: 450, y: 300 }, "add-fft");
+        this.createNode('processing/fft', 'FFT Node');
+    },
+
+    createComputeNode() {
+        this.createNode('processing/compute', 'Compute Node');
     },
     
     createAlarmNode() {

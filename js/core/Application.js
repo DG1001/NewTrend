@@ -134,6 +134,7 @@ const Application = {
             this.bindEvent("add-statistics", () => helpers.createStatisticsNode());
             this.bindEvent("add-formula", () => helpers.createFormulaNode());
             this.bindEvent("add-fft", () => helpers.createFFTNode());
+            this.bindEvent("add-compute", () => helpers.createComputeNode());
             
             // Visualization
             this.bindEvent("add-gauge", () => helpers.createGaugeNode());
