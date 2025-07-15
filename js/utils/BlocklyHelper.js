@@ -1,6 +1,9 @@
 const BlocklyHelper = {
     workspace: null,
     currentNode: null,
+    closeHandler: null,
+    saveHandler: null,
+    escapeHandler: null,
 
     open(node) {
         this.currentNode = node;
@@ -9,6 +12,9 @@ const BlocklyHelper = {
     },
 
     showEditor() {
+        // Clean up any existing modal first
+        this.cleanupExistingModal();
+        
         // Generate a unique ID for the Blockly container
         this.editorDivId = 'blockly-div-' + Date.now();
         const editorHTML = `
@@ -29,8 +35,47 @@ const BlocklyHelper = {
         `;
         document.body.insertAdjacentHTML('beforeend', editorHTML);
 
-        document.getElementById('blockly-close').addEventListener('click', () => this.close());
-        document.getElementById('blockly-save').addEventListener('click', () => this.save());
+        // Store event handler references for proper cleanup
+        this.closeHandler = () => this.close();
+        this.saveHandler = () => this.save();
+        this.escapeHandler = (e) => {
+            if (e.key === 'Escape') {
+                this.close();
+            }
+        };
+        
+        // Attach event listeners
+        const closeButton = document.getElementById('blockly-close');
+        const saveButton = document.getElementById('blockly-save');
+        
+        if (closeButton) {
+            closeButton.addEventListener('click', this.closeHandler);
+        }
+        if (saveButton) {
+            saveButton.addEventListener('click', this.saveHandler);
+        }
+        
+        // Add escape key handler
+        document.addEventListener('keydown', this.escapeHandler);
+    },
+
+    cleanupExistingModal() {
+        // Remove existing modal if it exists
+        const existingEditor = document.getElementById('blockly-editor');
+        if (existingEditor) {
+            existingEditor.remove();
+        }
+        
+        // Clean up existing event listeners
+        if (this.escapeHandler) {
+            document.removeEventListener('keydown', this.escapeHandler);
+        }
+        
+        // Dispose of existing workspace
+        if (this.workspace) {
+            this.workspace.dispose();
+            this.workspace = null;
+        }
     },
 
     injectBlockly() {
@@ -83,14 +128,28 @@ const BlocklyHelper = {
     },
 
     close() {
+        // Clean up event listeners first
+        if (this.escapeHandler) {
+            document.removeEventListener('keydown', this.escapeHandler);
+            this.escapeHandler = null;
+        }
+        
+        // Dispose of workspace
         if (this.workspace) {
             this.workspace.dispose();
             this.workspace = null;
         }
+        
+        // Remove modal from DOM
         const editor = document.getElementById('blockly-editor');
         if (editor) {
             editor.remove();
         }
+        
+        // Clear handler references
+        this.closeHandler = null;
+        this.saveHandler = null;
+        this.currentNode = null;
     }
 };
 
