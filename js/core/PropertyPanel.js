@@ -131,6 +131,8 @@ const PropertyPanel = {
                 return this.generateSliderProperties(node);
             case 'FFTNode':
                 return this.generateFFTProperties(node);
+            case 'MQTTNode':
+                return this.generateMQTTProperties(node);
             default:
                 return '<div class="property"><p>No specific properties available for this node type.</p></div>';
         }
@@ -326,6 +328,9 @@ const PropertyPanel = {
                 break;
             case 'FFTNode':
                 this.updateFFTProperties(node);
+                break;
+            case 'MQTTNode':
+                this.updateMQTTProperties(node);
                 break;
         }
         
@@ -946,6 +951,64 @@ const PropertyPanel = {
             node.properties.outputMode = outputModeField.value;
             if (node.onPropertyChanged) {
                 node.onPropertyChanged('outputMode', outputModeField.value);
+            }
+        }
+    },
+    
+    // MQTT node properties
+    generateMQTTProperties(node) {
+        return `
+            <div class="property">
+                <label>Broker IP:</label>
+                <input type="text" id="prop-brokerIP" value="${node.properties.brokerIP}" placeholder="localhost">
+            </div>
+            <div class="property">
+                <label>Broker Port:</label>
+                <input type="number" id="prop-brokerPort" value="${node.properties.brokerPort}" min="1" max="65535">
+                <small>WebSocket port (usually MQTT port + 1)</small>
+            </div>
+            <div class="property">
+                <label>Topic:</label>
+                <input type="text" id="prop-topic" value="${node.properties.topic}" placeholder="sensors/temperature">
+            </div>
+            <div class="property">
+                <label>Connection Status:</label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 12px; height: 12px; border-radius: 50%; background-color: ${node.connected ? '#2ECC71' : '#E74C3C'};"></div>
+                    <span style="font-size: 12px; color: #666;">${node.connected ? 'Connected' : 'Disconnected'}</span>
+                </div>
+            </div>
+            <div class="property">
+                <label>Last Message:</label>
+                <div style="font-size: 11px; color: #666; padding: 5px; background: #f9f9f9; border-radius: 3px;">
+                    ${node.lastMessage || 'No messages yet'}
+                </div>
+            </div>
+        `;
+    },
+    
+    // Update MQTT properties
+    updateMQTTProperties(node) {
+        const brokerIPField = document.getElementById("prop-brokerIP");
+        const brokerPortField = document.getElementById("prop-brokerPort");
+        const topicField = document.getElementById("prop-topic");
+        
+        if (brokerIPField) {
+            node.properties.brokerIP = brokerIPField.value;
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('brokerIP', brokerIPField.value);
+            }
+        }
+        if (brokerPortField) {
+            node.properties.brokerPort = parseInt(brokerPortField.value);
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('brokerPort', parseInt(brokerPortField.value));
+            }
+        }
+        if (topicField) {
+            node.properties.topic = topicField.value;
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('topic', topicField.value);
             }
         }
     },

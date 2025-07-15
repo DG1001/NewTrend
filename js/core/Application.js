@@ -126,6 +126,7 @@ const Application = {
             this.bindEvent("add-button", () => helpers.createButtonNode());
             this.bindEvent("add-switch", () => helpers.createSwitchNode());
             this.bindEvent("add-slider", () => helpers.createSliderNode());
+            this.bindEvent("add-mqtt", () => helpers.createMQTTNode());
             
             // Processing & Analysis
             this.bindEvent("add-filter", () => helpers.createFilterNode());

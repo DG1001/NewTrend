@@ -75,6 +75,10 @@ const ToolbarHelpers = {
         return this.createNode("trendows/slider", { x: 650, y: 500 }, "add-slider");
     },
     
+    createMQTTNode() {
+        return this.createNode("trendows/mqtt", { x: 800, y: 500 }, "add-mqtt");
+    },
+    
     createFormulaNode() {
         return this.createNode("trendows/formula", { x: 300, y: 300 }, "add-formula");
     },

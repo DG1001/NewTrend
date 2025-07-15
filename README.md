@@ -6,7 +6,7 @@ A web-based visual node editor for creating sensor monitoring and data processin
 
 - **Visual Node Editor**: Drag-and-drop interface powered by LiteGraph.js
 - **Real-time Simulation**: Live sensor data generation and processing
-- **Comprehensive Node Library** (21 node types):
+- **Comprehensive Node Library** (22 node types):
   
   **Data Sources & Display:**
   - 🌡️ **Sensor Nodes**: Temperature, humidity, pressure, flow, and custom ranges
@@ -15,6 +15,7 @@ A web-based visual node editor for creating sensor monitoring and data processin
   - 🖱️ **Button Nodes**: Interactive buttons for triggering events (boolean output)
   - 🎛️ **Switch Nodes**: Toggle switches for persistent on/off states (boolean output)
   - 📊 **Slider Nodes**: Adjustable sliders for numeric input with configurable ranges
+  - 📡 **MQTT Nodes**: Real-time data from MQTT brokers (WebSocket connection, float values)
   
   **Processing & Analysis:**
   - 🔍 **Filter Nodes**: Moving average, median, and low-pass filtering
@@ -46,6 +47,7 @@ A web-based visual node editor for creating sensor monitoring and data processin
 
 - Modern web browser (Chrome, Firefox, Safari, Edge)
 - No additional software installation required
+- For MQTT connectivity: Access to an MQTT broker with WebSocket support
 
 ### Running the Application
 
@@ -56,6 +58,15 @@ A web-based visual node editor for creating sensor monitoring and data processin
    - Connect nodes by dragging from output to input ports
    - Select nodes to edit properties in the right panel
    - Use "Simulation starten" to begin real-time data flow
+
+### Development Setup
+
+For development and extending the node library:
+
+1. **File Structure**: All nodes are organized in `js/nodes/` by category
+2. **No Build Process**: Direct file editing - changes are immediately visible on page refresh
+3. **Browser DevTools**: Use F12 for debugging and console output
+4. **Local Development**: Serve via local HTTP server for full functionality (due to CORS restrictions)
 
 ## Usage
 
@@ -74,6 +85,7 @@ A web-based visual node editor for creating sensor monitoring and data processin
 3. **Slider Controls**: Add Slider nodes for adjustable numeric inputs
 4. **Boolean Logic**: Connect buttons/switches to Counter nodes or LED indicators for interactive control
 5. **Manual Override**: Use interactive nodes to manually control automation systems
+6. **MQTT Integration**: Connect to MQTT brokers to receive real-time sensor data from IoT devices
 
 ### Building Advanced Monitoring Systems
 
@@ -83,6 +95,10 @@ A web-based visual node editor for creating sensor monitoring and data processin
 4. **Process Control**: Implement PID controllers with real-time feedback loops
 5. **Data Processing**: Chain Filter and Statistics nodes for signal conditioning
 6. **Spectral Analysis**: Use FFT nodes for vibration monitoring and frequency analysis
+7. **IoT Integration**: Connect MQTT nodes to receive live data from IoT sensors and devices
+8. **Interactive Control**: Use Button, Switch, and Slider nodes for manual system control
+9. **Real-time Analytics**: Combine FFT, Statistics, and Filter nodes for signal analysis
+10. **Multi-signal Processing**: Mix numeric and boolean signals in complex logic flows
 
 ### Advanced Features
 
@@ -103,6 +119,8 @@ A web-based visual node editor for creating sensor monitoring and data processin
 - **Mixed Signal Types**: Seamless integration of numeric and boolean signals in the same flow
 - **Frequency Domain Analysis**: FFT processing with configurable window functions and sizes
 - **Spectral Monitoring**: Real-time peak frequency detection and magnitude analysis
+- **IoT Connectivity**: MQTT integration for receiving real-time data from IoT devices and sensors
+- **Real-time Data Streaming**: WebSocket-based MQTT connections for live data visualization
 
 ## Project Structure
 
@@ -138,6 +156,7 @@ A web-based visual node editor for creating sensor monitoring and data processin
 │   │   │   ├── ButtonNode.js
 │   │   │   ├── ConstantNode.js
 │   │   │   ├── DisplayNode.js
+│   │   │   ├── MQTTNode.js
 │   │   │   ├── SensorNode.js
 │   │   │   ├── SliderNode.js
 │   │   │   └── SwitchNode.js
@@ -159,15 +178,46 @@ A web-based visual node editor for creating sensor monitoring and data processin
 - **Frontend**: Vanilla JavaScript, HTML5, CSS3
 - **Node Editor**: [LiteGraph.js](https://github.com/jagenjo/litegraph.js) v0.7.14
 - **Icons**: Font Awesome v5.15.4
+- **MQTT**: [MQTT.js](https://github.com/mqttjs/MQTT.js) for WebSocket connections
 - **No Build System**: Direct browser execution
 
 ## Development
 
 This is a client-side only application with no backend dependencies. All simulation data is generated in the browser using JavaScript.
 
+### Extending the Node Library
+
+The application is designed for easy extension with new node types. See `CLAUDE.md` for comprehensive development guidelines.
+
+#### Quick Start: Adding a New Node
+
+1. **Create Node Class**: Add a new file in `js/nodes/[category]/` extending `BaseNode`
+2. **Register Node**: Add registration in `js/core/NodeRegistry.js`
+3. **Add Properties**: Implement property panel support in `js/core/PropertyPanel.js`
+4. **Add Toolbar**: Create toolbar button and helper in `js/utils/ToolbarHelpers.js`
+5. **Update HTML**: Add script tag and toolbar button to `index.html`
+6. **Update Docs**: Increment node count and add feature description
+
+#### Node Categories
+
+- **sensors/**: Data input nodes (sensors, manual controls, external data)
+- **processing/**: Data transformation nodes (filters, math, analysis)
+- **visualization/**: Display nodes (charts, gauges, indicators)
+- **logic/**: Boolean logic and control flow nodes
+- **automation/**: Control systems and automation nodes
+
+#### Development Best Practices
+
+- Follow the existing naming conventions and file structure
+- Use consistent visual styling (colors, fonts, layouts)
+- Implement proper error handling and input validation
+- Add comprehensive property panels for configuration
+- Include visual feedback and status indicators
+- Document new features in both README.md and CLAUDE.md
+
 ### Key Components
 
-- **Node System**: 21 custom node types extending LiteGraph.LGraphNode
+- **Node System**: 22 custom node types extending LiteGraph.LGraphNode
 - **Simulation Engine**: 100ms interval-based real-time updates with time tracking
 - **Property Management**: Dynamic UI generation with color-coded panels
 - **Visualization Engine**: Canvas-based rendering for gauges, charts, and indicators

@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/litegraph.js@0.7.14/build/litegraph.min.js"></script>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 </head>
 <body>
     <header>
@@ -19,6 +20,7 @@
             <button id="add-button"><i class="fas fa-mouse-pointer"></i> Button</button>
             <button id="add-switch"><i class="fas fa-toggle-on"></i> Switch</button>
             <button id="add-slider"><i class="fas fa-sliders-h"></i> Slider</button>
+            <button id="add-mqtt"><i class="fas fa-wifi"></i> MQTT</button>
             
             <!-- Processing & Analysis -->
             <button id="add-filter"><i class="fas fa-filter"></i> Filter</button>
@@ -85,6 +87,7 @@
     <script src="js/nodes/sensors/ButtonNode.js"></script>
     <script src="js/nodes/sensors/SwitchNode.js"></script>
     <script src="js/nodes/sensors/SliderNode.js"></script>
+    <script src="js/nodes/sensors/MQTTNode.js"></script>
     
     <!-- Node classes - Processing & Analysis -->
     <script src="js/nodes/processing/FilterNode.js"></script>
