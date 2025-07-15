@@ -1,6 +1,8 @@
-# Trendows Web Prototype
+# Trendows Web Technical Preview
 
-A web-based visual node editor for creating sensor monitoring and data processing flows. Built for Kirsten Controls to simulate industrial monitoring scenarios with real-time data visualization.
+A web-based visual node editor for creating sensor monitoring and data processing flows. This is a **technical preview prototype** of the Trendows standard software, built for Kirsten Controls to demonstrate industrial monitoring scenarios with real-time data visualization.
+
+For more information about the full Trendows software suite, visit: https://www.kirsten-controls.de/kirsten-wp/trendows2/
 
 ## Features
 
@@ -251,4 +253,6 @@ See the [LICENSE](LICENSE) file for full license terms.
 
 ## Contact
 
-For questions or support regarding this prototype, please contact the Kirsten Controls development team.
+For questions or support regarding this technical preview prototype, please contact the Kirsten Controls development team.
+
+For information about the full Trendows software suite and commercial licensing, visit: https://www.kirsten-controls.de/kirsten-wp/trendows2/
