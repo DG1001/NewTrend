@@ -33,12 +33,13 @@ class DisplayNode extends BaseNode {
     
     onDrawForeground(ctx) {
         // Display current value
-        ctx.font = "16px Arial";
-        ctx.fillStyle = "#333";
+        ctx.font = "14px Arial";
+        ctx.fillStyle = "#ECF0F1";
         ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
         
         const displayValue = `${this.currentValue.toFixed(2)} ${this.properties.unit}`;
-        ctx.fillText(displayValue, this.size[0] * 0.5, this.size[1] * 0.4);
+        ctx.fillText(displayValue, this.size[0] * 0.5, this.size[1] * 0.35);
         
         // Draw mini-graph if enabled
         if (this.properties.showGraph && this.valueHistory.length > 1) {
@@ -52,17 +53,22 @@ class DisplayNode extends BaseNode {
         const graphW = this.size[0] - 20;
         const graphH = this.size[1] * 0.35;
         
-        // Graph background
-        ctx.fillStyle = "#f0f0f0";
+        // Graph background (dark)
+        ctx.fillStyle = "#2C3E50";
         ctx.fillRect(graphX, graphY, graphW, graphH);
+        
+        // Graph border
+        ctx.strokeStyle = "#34495E";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(graphX, graphY, graphW, graphH);
         
         // Find min/max for scaling
         const min = Math.min(...this.valueHistory);
         const max = Math.max(...this.valueHistory);
         const range = max - min || 1;
         
-        // Draw graph line
-        ctx.strokeStyle = "#27AE60";
+        // Draw graph line (bright green on dark background)
+        ctx.strokeStyle = "#2ECC71";
         ctx.lineWidth = 2;
         ctx.beginPath();
         
