@@ -1,39 +1,41 @@
 # Trendows Web Prototype Development Guidelines
 
 ## Project Setup
-- No build system or package manager required
-- Open `index.html` directly in a web browser to run
+- No build system or package manager
+- Run: Open `index.html` directly in browser
+- Test: Manual browser interaction
 
-## Code Style Guidelines
-- Vanilla JavaScript (ES6+)
-- Use 2-space indentation
-- Prefer `camelCase` for variables and functions
-- Use `PascalCase` for class and node type names
-- Extend `LiteGraph.LGraphNode` for custom node types
-- Register custom nodes with `LiteGraph.registerNodeType()`
+## Code Style
+- Language: Vanilla JavaScript (ES6+)
+- Indentation: 2 spaces
+- Naming:
+  - `camelCase` for variables/functions
+  - `PascalCase` for classes/node types
+- Imports: Inline script tags in `index.html`
 
-## Development Conventions
-- Nodes must check `simulationRunning` before generating data
-- Use centralized `showNodeProperties()` for property panel updates
-- Utilize `flashToolbarButton()` for consistent UI feedback
-- Avoid external dependencies beyond LiteGraph.js (v0.7.14)
+## Node Development
+- Extend `BaseNode` for custom nodes
+- Register with `LiteGraph.registerNodeType()`
+- Check `simulationRunning` before data generation
+- Use `getInputData()` and `setOutputData()` for connections
 
 ## Error Handling
-- Prefer inline error checks
-- Use console warnings for non-critical issues
-- Gracefully handle undefined or invalid inputs
-
-## Testing
-- Manual testing via browser interaction
-- Verify node behavior under different simulation states
-- Test edge cases in formula and alarm node configurations
+- Inline error checks
+- Console warnings for non-critical issues
+- Gracefully handle undefined inputs
+- Avoid throwing errors that interrupt simulation
 
 ## Performance
-- Optimize node `onExecute()` methods
+- Optimize `onExecute()` methods
 - Limit data generation to 100ms intervals
 - Minimize DOM manipulations
 
-## Recommended Tools
-- Modern browser with JavaScript console
-- LiteGraph.js documentation
-- Font Awesome (v5.15.4) for icons
+## Dependencies
+- LiteGraph.js (v0.7.14)
+- Font Awesome (v5.15.4)
+- No external libraries beyond these
+
+## Testing
+- Browser-based manual testing
+- Verify node behaviors
+- Test edge cases in complex configurations
