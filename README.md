@@ -6,7 +6,7 @@ A web-based visual node editor for creating sensor monitoring and data processin
 
 - **Visual Node Editor**: Drag-and-drop interface powered by LiteGraph.js
 - **Real-time Simulation**: Live sensor data generation and processing
-- **Comprehensive Node Library** (22 node types):
+- **Comprehensive Node Library** (23 node types):
   
   **Data Sources & Display:**
   - 🌡️ **Sensor Nodes**: Temperature, humidity, pressure, flow, and custom ranges
@@ -22,6 +22,7 @@ A web-based visual node editor for creating sensor monitoring and data processin
   - 📈 **Statistics Nodes**: Real-time min/max/average calculations
   - 🧮 **Formula Nodes**: Mathematical operations and custom JavaScript formulas
   - 📊 **FFT Nodes**: Fast Fourier Transform for frequency domain analysis with windowing
+  - 🧠 **Compute Nodes**: Visual programming with Blockly for complex logic and calculations
   
   **Enhanced Visualization:**
   - 📊 **Gauge Nodes**: Analog-style circular gauges with color-coded warning zones
@@ -99,10 +100,13 @@ For development and extending the node library:
 8. **Interactive Control**: Use Button, Switch, and Slider nodes for manual system control
 9. **Real-time Analytics**: Combine FFT, Statistics, and Filter nodes for signal analysis
 10. **Multi-signal Processing**: Mix numeric and boolean signals in complex logic flows
+11. **Visual Programming**: Use Compute nodes with Blockly for complex logic without writing code
+12. **Custom Algorithms**: Create sophisticated data processing pipelines with visual programming blocks
 
 ### Advanced Features
 
 - **Custom Formulas**: Use JavaScript expressions like `a * b + 10` or `Math.sin(a)`
+- **Visual Programming**: Create complex logic with Blockly drag-and-drop programming interface
 - **Logic Gate Operations**: Expandable inputs for complex boolean logic
 - **PID Control**: Proportional-Integral-Derivative control with tunable parameters
 - **Statistical Analysis**: Real-time data filtering and statistical calculations
@@ -121,6 +125,8 @@ For development and extending the node library:
 - **Spectral Monitoring**: Real-time peak frequency detection and magnitude analysis
 - **IoT Connectivity**: MQTT integration for receiving real-time data from IoT devices and sensors
 - **Real-time Data Streaming**: WebSocket-based MQTT connections for live data visualization
+- **Visual Programming**: Blockly-based drag-and-drop programming for complex logic without coding
+- **Dynamic Code Generation**: Automatic JavaScript code generation from visual blocks with real-time execution
 
 ## Project Structure
 
@@ -148,6 +154,7 @@ For development and extending the node library:
 │   │   │   ├── NotGateNode.js
 │   │   │   └── OrGateNode.js
 │   │   ├── processing/
+│   │   │   ├── ComputeNode.js
 │   │   │   ├── FilterNode.js
 │   │   │   ├── FormulaNode.js
 │   │   │   ├── FFTNode.js
@@ -167,7 +174,8 @@ For development and extending the node library:
 │   └── utils/                # Utility functions and classes
 │       ├── SensorData.js       # Manages historical data for sensors
 │       ├── ToolbarHelpers.js   # Helper functions for creating toolbar buttons
-│       └── FFTHelper.js        # FFT algorithms and windowing functions
+│       ├── FFTHelper.js        # FFT algorithms and windowing functions
+│       └── BlocklyHelper.js    # Blockly visual programming integration
 ├── AGENTS.md               # Guidance for AI agents working on this project
 ├── CLAUDE.md               # AI development guidance (legacy)
 └── README.md               # This file
@@ -217,7 +225,7 @@ The application is designed for easy extension with new node types. See `CLAUDE.
 
 ### Key Components
 
-- **Node System**: 22 custom node types extending LiteGraph.LGraphNode
+- **Node System**: 23 custom node types extending LiteGraph.LGraphNode
 - **Simulation Engine**: 100ms interval-based real-time updates with time tracking
 - **Property Management**: Dynamic UI generation with color-coded panels
 - **Visualization Engine**: Canvas-based rendering for gauges, charts, and indicators
@@ -233,7 +241,13 @@ The application is designed for easy extension with new node types. See `CLAUDE.
 
 ## License
 
-Proprietary - Kirsten Controls
+This project is licensed under the Kirsten Controls Non-Commercial License. 
+
+**Non-Commercial Use**: You are free to use, modify, and distribute this software for personal, educational, research, and other non-commercial purposes.
+
+**Commercial Use**: All commercial rights are reserved by Kirsten Controlsystems. Commercial use requires a separate commercial license. Please contact Kirsten Controlsystems for commercial licensing inquiries.
+
+See the [LICENSE](LICENSE) file for full license terms.
 
 ## Contact
 
