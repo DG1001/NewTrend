@@ -124,6 +124,8 @@ const Application = {
             this.bindEvent("add-display", () => helpers.createDisplayNode());
             this.bindEvent("add-constant", () => helpers.createConstantNode());
             this.bindEvent("add-button", () => helpers.createButtonNode());
+            this.bindEvent("add-switch", () => helpers.createSwitchNode());
+            this.bindEvent("add-slider", () => helpers.createSliderNode());
             
             // Processing & Analysis
             this.bindEvent("add-filter", () => helpers.createFilterNode());

@@ -123,6 +123,12 @@ const PropertyPanel = {
                 return this.generateLogicGateProperties(node);
             case 'NotGateNode':
                 return this.generateLogicGateProperties(node);
+            case 'ButtonNode':
+                return this.generateButtonProperties(node);
+            case 'SwitchNode':
+                return this.generateSwitchProperties(node);
+            case 'SliderNode':
+                return this.generateSliderProperties(node);
             default:
                 return '<div class="property"><p>No specific properties available for this node type.</p></div>';
         }
@@ -306,6 +312,15 @@ const PropertyPanel = {
             case 'OrGateNode':
             case 'NotGateNode':
                 this.updateLogicGateProperties(node);
+                break;
+            case 'ButtonNode':
+                this.updateButtonProperties(node);
+                break;
+            case 'SwitchNode':
+                this.updateSwitchProperties(node);
+                break;
+            case 'SliderNode':
+                this.updateSliderProperties(node);
                 break;
         }
         
@@ -718,6 +733,133 @@ const PropertyPanel = {
     // Update logic gate properties
     updateLogicGateProperties(node) {
         // Logic gates only have name property which is handled by common update
+    },
+    
+    // Button node properties
+    generateButtonProperties(node) {
+        return `
+            <div class="property">
+                <label>Button Text:</label>
+                <input type="text" id="prop-buttonText" value="${node.properties.buttonText}" placeholder="Button text">
+            </div>
+        `;
+    },
+    
+    // Switch node properties
+    generateSwitchProperties(node) {
+        return `
+            <div class="property">
+                <label>Switch Text:</label>
+                <input type="text" id="prop-switchText" value="${node.properties.switchText}" placeholder="Switch text">
+            </div>
+            <div class="property">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="prop-defaultState" ${node.properties.defaultState ? "checked" : ""}>
+                    <label for="prop-defaultState" style="display: inline; font-weight: normal;">Default State (On)</label>
+                </div>
+            </div>
+        `;
+    },
+    
+    // Slider node properties
+    generateSliderProperties(node) {
+        return `
+            <div class="property">
+                <label>Slider Text:</label>
+                <input type="text" id="prop-sliderText" value="${node.properties.sliderText}" placeholder="Slider text">
+            </div>
+            <div class="property">
+                <label>Range:</label>
+                <div style="display: flex; gap: 10px;">
+                    <div style="flex: 1;">
+                        <label>Min:</label>
+                        <input type="number" id="prop-minValue" value="${node.properties.minValue}">
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Max:</label>
+                        <input type="number" id="prop-maxValue" value="${node.properties.maxValue}">
+                    </div>
+                </div>
+            </div>
+            <div class="property">
+                <label>Step:</label>
+                <input type="number" id="prop-step" value="${node.properties.step}" min="0.01" step="0.01">
+            </div>
+            <div class="property">
+                <label>Default Value:</label>
+                <input type="number" id="prop-defaultValue" value="${node.properties.defaultValue}">
+            </div>
+        `;
+    },
+    
+    // Update button properties
+    updateButtonProperties(node) {
+        const buttonTextField = document.getElementById("prop-buttonText");
+        if (buttonTextField) {
+            node.properties.buttonText = buttonTextField.value;
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('buttonText', buttonTextField.value);
+            }
+        }
+    },
+    
+    // Update switch properties
+    updateSwitchProperties(node) {
+        const switchTextField = document.getElementById("prop-switchText");
+        const defaultStateField = document.getElementById("prop-defaultState");
+        
+        if (switchTextField) {
+            node.properties.switchText = switchTextField.value;
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('switchText', switchTextField.value);
+            }
+        }
+        if (defaultStateField) {
+            node.properties.defaultState = defaultStateField.checked;
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('defaultState', defaultStateField.checked);
+            }
+        }
+    },
+    
+    // Update slider properties
+    updateSliderProperties(node) {
+        const sliderTextField = document.getElementById("prop-sliderText");
+        const minValueField = document.getElementById("prop-minValue");
+        const maxValueField = document.getElementById("prop-maxValue");
+        const stepField = document.getElementById("prop-step");
+        const defaultValueField = document.getElementById("prop-defaultValue");
+        
+        if (sliderTextField) {
+            node.properties.sliderText = sliderTextField.value;
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('sliderText', sliderTextField.value);
+            }
+        }
+        if (minValueField) {
+            node.properties.minValue = parseFloat(minValueField.value);
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('minValue', parseFloat(minValueField.value));
+            }
+        }
+        if (maxValueField) {
+            node.properties.maxValue = parseFloat(maxValueField.value);
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('maxValue', parseFloat(maxValueField.value));
+            }
+        }
+        if (stepField) {
+            node.properties.step = parseFloat(stepField.value);
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('step', parseFloat(stepField.value));
+            }
+        }
+        if (defaultValueField) {
+            node.properties.defaultValue = parseFloat(defaultValueField.value);
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('defaultValue', parseFloat(defaultValueField.value));
+            }
+        }
     },
     
     // Reset PID controller

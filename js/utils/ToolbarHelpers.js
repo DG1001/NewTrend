@@ -67,6 +67,14 @@ const ToolbarHelpers = {
         return this.createNode("trendows/button", { x: 350, y: 500 }, "add-button");
     },
     
+    createSwitchNode() {
+        return this.createNode("trendows/switch", { x: 500, y: 500 }, "add-switch");
+    },
+    
+    createSliderNode() {
+        return this.createNode("trendows/slider", { x: 650, y: 500 }, "add-slider");
+    },
+    
     createFormulaNode() {
         return this.createNode("trendows/formula", { x: 300, y: 300 }, "add-formula");
     },

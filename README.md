@@ -6,12 +6,15 @@ A web-based visual node editor for creating sensor monitoring and data processin
 
 - **Visual Node Editor**: Drag-and-drop interface powered by LiteGraph.js
 - **Real-time Simulation**: Live sensor data generation and processing
-- **Comprehensive Node Library** (17 node types):
+- **Comprehensive Node Library** (20 node types):
   
   **Data Sources & Display:**
   - 🌡️ **Sensor Nodes**: Temperature, humidity, pressure, flow, and custom ranges
   - 📊 **Display Nodes**: Real-time values with optional mini-graphs
   - 🔢 **Constant Nodes**: Fixed value sources for calculations
+  - 🖱️ **Button Nodes**: Interactive buttons for triggering events (boolean output)
+  - 🎛️ **Switch Nodes**: Toggle switches for persistent on/off states (boolean output)
+  - 📊 **Slider Nodes**: Adjustable sliders for numeric input with configurable ranges
   
   **Processing & Analysis:**
   - 🔍 **Filter Nodes**: Moving average, median, and low-pass filtering
@@ -21,12 +24,12 @@ A web-based visual node editor for creating sensor monitoring and data processin
   **Enhanced Visualization:**
   - 📊 **Gauge Nodes**: Analog-style circular gauges with color-coded warning zones
   - 📈 **Chart Nodes**: Time-series line charts with multi-trace support and auto-scaling
-  - 💡 **LED Indicators**: Multi-state visual status indicators with blinking effects
+  - 💡 **LED Indicators**: Multi-state visual status indicators with blinking effects (supports both numeric and boolean inputs)
   
   **Logic & Control:**
   - ⚡ **Logic Gates**: AND, OR, NOT gates with expandable inputs
   - ⚖️ **Comparator Nodes**: Three-output comparison (greater, equal, less)
-  - 🔢 **Counter Nodes**: Edge-triggered counting with overflow detection
+  - 🔢 **Counter Nodes**: Edge-triggered counting with overflow detection (supports boolean triggers)
   
   **Automation & Monitoring:**
   - ⏱️ **Timer Nodes**: Interval and timeout-based operations
@@ -63,6 +66,14 @@ A web-based visual node editor for creating sensor monitoring and data processin
 4. **Configure**: Select each node to customize properties in the right panel
 5. **Simulate**: Click "Simulation starten" to see live data with real-time updates
 
+### Interactive Control Elements
+
+1. **Button Controls**: Add Button nodes for manual triggering of events
+2. **Switch Controls**: Use Switch nodes for persistent on/off states
+3. **Slider Controls**: Add Slider nodes for adjustable numeric inputs
+4. **Boolean Logic**: Connect buttons/switches to Counter nodes or LED indicators for interactive control
+5. **Manual Override**: Use interactive nodes to manually control automation systems
+
 ### Building Advanced Monitoring Systems
 
 1. **Industrial Dashboard**: Combine Gauge nodes for pressure/temperature monitoring
@@ -85,6 +96,9 @@ A web-based visual node editor for creating sensor monitoring and data processin
 - **Visual Status Feedback**: Color-coded indicators with blinking alarms and smooth animations
 - **Custom Sensor Ranges**: Define min/max values for realistic simulations
 - **Graph Visualization**: Enable mini-graphs in display nodes for trend analysis
+- **Interactive Controls**: Button, switch, and slider nodes for manual system control
+- **Boolean Signal Processing**: Direct boolean connections for logic operations and event triggering
+- **Mixed Signal Types**: Seamless integration of numeric and boolean signals in the same flow
 
 ## Project Structure
 
@@ -119,9 +133,12 @@ A web-based visual node editor for creating sensor monitoring and data processin
 │   │   │   ├── FormulaNode.js
 │   │   │   └── StatisticsNode.js
 │   │   ├── sensors/
+│   │   │   ├── ButtonNode.js
 │   │   │   ├── ConstantNode.js
 │   │   │   ├── DisplayNode.js
-│   │   │   └── SensorNode.js
+│   │   │   ├── SensorNode.js
+│   │   │   ├── SliderNode.js
+│   │   │   └── SwitchNode.js
 │   │   └── visualization/
 │   │       ├── ChartNode.js
 │   │       ├── GaugeNode.js
@@ -147,7 +164,7 @@ This is a client-side only application with no backend dependencies. All simulat
 
 ### Key Components
 
-- **Node System**: 17 custom node types extending LiteGraph.LGraphNode
+- **Node System**: 20 custom node types extending LiteGraph.LGraphNode
 - **Simulation Engine**: 100ms interval-based real-time updates with time tracking
 - **Property Management**: Dynamic UI generation with color-coded panels
 - **Visualization Engine**: Canvas-based rendering for gauges, charts, and indicators
