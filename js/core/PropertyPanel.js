@@ -158,13 +158,38 @@ const PropertyPanel = {
                 <input type="text" id="prop-unit" value="${node.properties.unit}" placeholder="z.B. °C, %, hPa">
             </div>
             <div class="property">
+                <label>Signalform:</label>
+                <select id="prop-waveform">
+                    <option value="random" ${node.properties.waveform === "random" ? "selected" : ""}>Zufallswerte</option>
+                    <option value="sine" ${node.properties.waveform === "sine" ? "selected" : ""}>Sinus</option>
+                    <option value="square" ${node.properties.waveform === "square" ? "selected" : ""}>Rechteck</option>
+                    <option value="sawtooth" ${node.properties.waveform === "sawtooth" ? "selected" : ""}>Sägezahn</option>
+                </select>
+            </div>
+            <div class="property" id="waveform-controls" style="display: ${node.properties.waveform !== 'random' ? 'block' : 'none'};">
+                <div style="display: flex; gap: 10px;">
+                    <div style="flex: 1;">
+                        <label>Frequenz (Hz):</label>
+                        <input type="number" id="prop-frequency" value="${node.properties.frequency}" min="0.1" max="10" step="0.1">
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Amplitude:</label>
+                        <input type="number" id="prop-amplitude" value="${node.properties.amplitude}" min="1" max="1000">
+                    </div>
+                </div>
+            </div>
+            <div class="property" id="waveform-offset" style="display: ${node.properties.waveform !== 'random' ? 'block' : 'none'};">
+                <label>Offset (Mittelwert):</label>
+                <input type="number" id="prop-offset" value="${node.properties.offset}" min="-1000" max="1000">
+            </div>
+            <div class="property" id="random-controls" style="display: ${node.properties.waveform === 'random' ? 'block' : 'none'};">
                 <label>Wertebereich:</label>
                 <div class="checkbox-wrapper">
                     <input type="checkbox" id="prop-useCustomRange" ${node.properties.useCustomRange ? "checked" : ""}>
                     <label for="prop-useCustomRange" style="display: inline; font-weight: normal;">Benutzerdefinierten Bereich verwenden</label>
                 </div>
             </div>
-            <div class="property">
+            <div class="property" id="random-range" style="display: ${node.properties.waveform === 'random' && node.properties.useCustomRange ? 'block' : 'none'};">
                 <div style="display: flex; gap: 10px;">
                     <div style="flex: 1;">
                         <label>Min:</label>
@@ -352,15 +377,80 @@ const PropertyPanel = {
     updateSensorProperties(node) {
         const typeField = document.getElementById("prop-type");
         const unitField = document.getElementById("prop-unit");
+        const waveformField = document.getElementById("prop-waveform");
+        const frequencyField = document.getElementById("prop-frequency");
+        const amplitudeField = document.getElementById("prop-amplitude");
+        const offsetField = document.getElementById("prop-offset");
         const useCustomRangeField = document.getElementById("prop-useCustomRange");
         const minField = document.getElementById("prop-min");
         const maxField = document.getElementById("prop-max");
         
-        if (typeField) node.properties.type = typeField.value;
+        if (typeField) {
+            node.properties.type = typeField.value;
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('type', typeField.value);
+            }
+        }
         if (unitField) node.properties.unit = unitField.value;
-        if (useCustomRangeField) node.properties.useCustomRange = useCustomRangeField.checked;
+        if (waveformField) {
+            node.properties.waveform = waveformField.value;
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('waveform', waveformField.value);
+            }
+            // Update UI visibility
+            this.updateWaveformControlsVisibility(waveformField.value);
+        }
+        if (frequencyField) {
+            node.properties.frequency = parseFloat(frequencyField.value);
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('frequency', parseFloat(frequencyField.value));
+            }
+        }
+        if (amplitudeField) {
+            node.properties.amplitude = parseFloat(amplitudeField.value);
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('amplitude', parseFloat(amplitudeField.value));
+            }
+        }
+        if (offsetField) {
+            node.properties.offset = parseFloat(offsetField.value);
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('offset', parseFloat(offsetField.value));
+            }
+        }
+        if (useCustomRangeField) {
+            node.properties.useCustomRange = useCustomRangeField.checked;
+            this.updateRandomRangeVisibility(useCustomRangeField.checked);
+        }
         if (minField) node.properties.min = parseFloat(minField.value);
         if (maxField) node.properties.max = parseFloat(maxField.value);
+    },
+    
+    updateWaveformControlsVisibility(waveform) {
+        const waveformControls = document.getElementById("waveform-controls");
+        const waveformOffset = document.getElementById("waveform-offset");
+        const randomControls = document.getElementById("random-controls");
+        const randomRange = document.getElementById("random-range");
+        
+        if (waveform === 'random') {
+            if (waveformControls) waveformControls.style.display = 'none';
+            if (waveformOffset) waveformOffset.style.display = 'none';
+            if (randomControls) randomControls.style.display = 'block';
+            const useCustomRange = document.getElementById("prop-useCustomRange");
+            if (randomRange) randomRange.style.display = useCustomRange && useCustomRange.checked ? 'block' : 'none';
+        } else {
+            if (waveformControls) waveformControls.style.display = 'block';
+            if (waveformOffset) waveformOffset.style.display = 'block';
+            if (randomControls) randomControls.style.display = 'none';
+            if (randomRange) randomRange.style.display = 'none';
+        }
+    },
+    
+    updateRandomRangeVisibility(useCustomRange) {
+        const randomRange = document.getElementById("random-range");
+        if (randomRange) {
+            randomRange.style.display = useCustomRange ? 'block' : 'none';
+        }
     },
     
     // Update display node properties
