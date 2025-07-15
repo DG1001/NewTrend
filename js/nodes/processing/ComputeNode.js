@@ -1,12 +1,16 @@
 class ComputeNode extends BaseNode {
     constructor(title) {
         super(title || 'Compute Node');
-        this.addInput('Input 1', 'number');
-        this.addOutput('Output 1', 'number');
-
+        
+        // Initialize properties first
         this.properties.blocklyXML = '';
         this.properties.generatedCode = '';
+        this.properties.inputCount = 1;
+        this.properties.outputCount = 1;
         this.globals = {}; // Initialize globals object
+
+        // Set up initial inputs and outputs
+        this.updateInputsOutputs();
 
         this.addWidget('button', 'Open Editor', null, () => {
             this.openBlocklyEditor();
@@ -39,6 +43,37 @@ class ComputeNode extends BaseNode {
             inputs[i] = this.getInputData(i);
         }
         return inputs;
+    }
+
+    updateInputsOutputs() {
+        // Remove existing inputs and outputs
+        this.inputs.length = 0;
+        this.outputs.length = 0;
+        
+        // Add inputs based on inputCount
+        for (let i = 1; i <= this.properties.inputCount; i++) {
+            this.addInput(`Input ${i}`, 'number');
+        }
+        
+        // Add outputs based on outputCount
+        for (let i = 1; i <= this.properties.outputCount; i++) {
+            this.addOutput(`Output ${i}`, 'number');
+        }
+        
+        // Resize node to accommodate new inputs/outputs
+        this.size = this.computeSize();
+    }
+    
+    onPropertyChanged(name, value) {
+        if (name === 'inputCount' || name === 'outputCount') {
+            // Ensure value is within valid range
+            if (name === 'inputCount') {
+                this.properties.inputCount = Math.max(1, Math.min(10, parseInt(value) || 1));
+            } else if (name === 'outputCount') {
+                this.properties.outputCount = Math.max(1, Math.min(10, parseInt(value) || 1));
+            }
+            this.updateInputsOutputs();
+        }
     }
 
     openBlocklyEditor() {

@@ -61,6 +61,7 @@ const PropertyPanel = {
             'FilterNode': { cssClass: 'filter-properties', icon: 'fa-filter' },
             'StatisticsNode': { cssClass: 'statistics-properties', icon: 'fa-chart-bar' },
             'FormulaNode': { cssClass: 'formula-properties', icon: 'fa-calculator' },
+            'ComputeNode': { cssClass: 'compute-properties', icon: 'fa-microchip' },
             
             // Visualization
             'GaugeNode': { cssClass: 'gauge-properties', icon: 'fa-tachometer-alt' },
@@ -135,6 +136,8 @@ const PropertyPanel = {
                 return this.generateMQTTProperties(node);
             case 'MQTTSendNode':
                 return this.generateMQTTSendProperties(node);
+            case 'ComputeNode':
+                return this.generateComputeProperties(node);
             default:
                 return '<div class="property"><p>No specific properties available for this node type.</p></div>';
         }
@@ -361,6 +364,9 @@ const PropertyPanel = {
                 break;
             case 'MQTTSendNode':
                 this.updateMQTTSendProperties(node);
+                break;
+            case 'ComputeNode':
+                this.updateComputeProperties(node);
                 break;
         }
         
@@ -1211,6 +1217,52 @@ const PropertyPanel = {
                     button.innerHTML = originalText;
                     button.style.backgroundColor = '#E67E22';
                 }, 1000);
+            }
+        }
+    },
+    
+    // Compute node properties
+    generateComputeProperties(node) {
+        return `
+            <div class="property">
+                <label>Number of Inputs:</label>
+                <input type="number" id="prop-inputCount" value="${node.properties.inputCount}" min="1" max="10">
+                <small>Configure 1-10 input connections for data processing</small>
+            </div>
+            <div class="property">
+                <label>Number of Outputs:</label>
+                <input type="number" id="prop-outputCount" value="${node.properties.outputCount}" min="1" max="10">
+                <small>Configure 1-10 output connections for computed results</small>
+            </div>
+            <div class="property">
+                <label>Blockly Code:</label>
+                <textarea id="prop-generatedCode" rows="4" readonly style="background-color: #f8f9fa; font-family: monospace; font-size: 12px;">${node.properties.generatedCode || 'Open Blockly Editor to generate code...'}</textarea>
+                <small>Generated JavaScript code from Blockly blocks (read-only)</small>
+            </div>
+        `;
+    },
+    
+    updateComputeProperties(node) {
+        const inputCountField = document.getElementById("prop-inputCount");
+        const outputCountField = document.getElementById("prop-outputCount");
+        
+        if (inputCountField) {
+            const newInputCount = Math.max(1, Math.min(10, parseInt(inputCountField.value) || 1));
+            if (newInputCount !== node.properties.inputCount) {
+                node.properties.inputCount = newInputCount;
+                if (node.onPropertyChanged) {
+                    node.onPropertyChanged('inputCount', newInputCount);
+                }
+            }
+        }
+        
+        if (outputCountField) {
+            const newOutputCount = Math.max(1, Math.min(10, parseInt(outputCountField.value) || 1));
+            if (newOutputCount !== node.properties.outputCount) {
+                node.properties.outputCount = newOutputCount;
+                if (node.onPropertyChanged) {
+                    node.onPropertyChanged('outputCount', newOutputCount);
+                }
             }
         }
     },
