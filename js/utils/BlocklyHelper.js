@@ -99,8 +99,8 @@ Blockly.Blocks['get_input'] = {
 };
 
 Blockly.JavaScript['get_input'] = function(block) {
-  var value_input_index = Blockly.JavaScript.valueToCode(block, 'INPUT_INDEX', Blockly.JavaScript.ORDER_ATOMIC);
-  var code = `inputs[${value_input_index}]`;
+  var value_input_index = Blockly.JavaScript.valueToCode(block, 'INPUT_INDEX', Blockly.JavaScript.ORDER_ATOMIC) || '1';
+  var code = `inputs[${value_input_index} - 1]`;
   return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
@@ -121,8 +121,8 @@ Blockly.Blocks['set_output'] = {
 };
 
 Blockly.JavaScript['set_output'] = function(block) {
-  var value_output_index = Blockly.JavaScript.valueToCode(block, 'OUTPUT_INDEX', Blockly.JavaScript.ORDER_ATOMIC);
+  var value_output_index = Blockly.JavaScript.valueToCode(block, 'OUTPUT_INDEX', Blockly.JavaScript.ORDER_ATOMIC) || '1';
   var value_value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_ATOMIC);
-  var code = `outputs[${value_output_index}] = ${value_value};\n`;
+  var code = `outputs[${value_output_index} - 1] = ${value_value};\n`;
   return code;
 };
