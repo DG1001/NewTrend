@@ -6,7 +6,6 @@ class MQTTSendNode extends BaseNode {
         this.addInput('value', 'number');
         this.properties = {
             brokerIP: 'localhost',
-            brokerPort: 1883,
             wsPort: 1884,
             topic: 'sensors/output',
             name: 'MQTT Send 1',
@@ -189,9 +188,6 @@ class MQTTSendNode extends BaseNode {
     onPropertyChanged(name, value) {
         if (name === 'brokerIP') {
             this.properties.brokerIP = value;
-            this.reconnectWithNewSettings();
-        } else if (name === 'brokerPort') {
-            this.properties.brokerPort = parseInt(value);
             this.reconnectWithNewSettings();
         } else if (name === 'wsPort') {
             this.properties.wsPort = parseInt(value);
