@@ -6,7 +6,7 @@ A web-based visual node editor for creating sensor monitoring and data processin
 
 - **Visual Node Editor**: Drag-and-drop interface powered by LiteGraph.js
 - **Real-time Simulation**: Live sensor data generation and processing
-- **Comprehensive Node Library** (20 node types):
+- **Comprehensive Node Library** (21 node types):
   
   **Data Sources & Display:**
   - 🌡️ **Sensor Nodes**: Temperature, humidity, pressure, flow, and custom ranges
@@ -20,6 +20,7 @@ A web-based visual node editor for creating sensor monitoring and data processin
   - 🔍 **Filter Nodes**: Moving average, median, and low-pass filtering
   - 📈 **Statistics Nodes**: Real-time min/max/average calculations
   - 🧮 **Formula Nodes**: Mathematical operations and custom JavaScript formulas
+  - 📊 **FFT Nodes**: Fast Fourier Transform for frequency domain analysis with windowing
   
   **Enhanced Visualization:**
   - 📊 **Gauge Nodes**: Analog-style circular gauges with color-coded warning zones
@@ -81,6 +82,7 @@ A web-based visual node editor for creating sensor monitoring and data processin
 3. **Alarm Systems**: Connect LED indicators to Comparator nodes for visual alerts
 4. **Process Control**: Implement PID controllers with real-time feedback loops
 5. **Data Processing**: Chain Filter and Statistics nodes for signal conditioning
+6. **Spectral Analysis**: Use FFT nodes for vibration monitoring and frequency analysis
 
 ### Advanced Features
 
@@ -99,6 +101,8 @@ A web-based visual node editor for creating sensor monitoring and data processin
 - **Interactive Controls**: Button, switch, and slider nodes for manual system control
 - **Boolean Signal Processing**: Direct boolean connections for logic operations and event triggering
 - **Mixed Signal Types**: Seamless integration of numeric and boolean signals in the same flow
+- **Frequency Domain Analysis**: FFT processing with configurable window functions and sizes
+- **Spectral Monitoring**: Real-time peak frequency detection and magnitude analysis
 
 ## Project Structure
 
@@ -128,6 +132,7 @@ A web-based visual node editor for creating sensor monitoring and data processin
 │   │   ├── processing/
 │   │   │   ├── FilterNode.js
 │   │   │   ├── FormulaNode.js
+│   │   │   ├── FFTNode.js
 │   │   │   └── StatisticsNode.js
 │   │   ├── sensors/
 │   │   │   ├── ButtonNode.js
@@ -142,7 +147,8 @@ A web-based visual node editor for creating sensor monitoring and data processin
 │   │       └── LedIndicatorNode.js
 │   └── utils/                # Utility functions and classes
 │       ├── SensorData.js       # Manages historical data for sensors
-│       └── ToolbarHelpers.js   # Helper functions for creating toolbar buttons
+│       ├── ToolbarHelpers.js   # Helper functions for creating toolbar buttons
+│       └── FFTHelper.js        # FFT algorithms and windowing functions
 ├── AGENTS.md               # Guidance for AI agents working on this project
 ├── CLAUDE.md               # AI development guidance (legacy)
 └── README.md               # This file
@@ -161,7 +167,7 @@ This is a client-side only application with no backend dependencies. All simulat
 
 ### Key Components
 
-- **Node System**: 20 custom node types extending LiteGraph.LGraphNode
+- **Node System**: 21 custom node types extending LiteGraph.LGraphNode
 - **Simulation Engine**: 100ms interval-based real-time updates with time tracking
 - **Property Management**: Dynamic UI generation with color-coded panels
 - **Visualization Engine**: Canvas-based rendering for gauges, charts, and indicators

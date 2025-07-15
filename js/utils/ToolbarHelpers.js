@@ -79,6 +79,10 @@ const ToolbarHelpers = {
         return this.createNode("trendows/formula", { x: 300, y: 300 }, "add-formula");
     },
     
+    createFFTNode() {
+        return this.createNode("trendows/fft", { x: 450, y: 300 }, "add-fft");
+    },
+    
     createAlarmNode() {
         return this.createNode("trendows/alarm", { x: 500, y: 300 }, "add-alarm");
     },

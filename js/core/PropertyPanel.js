@@ -129,6 +129,8 @@ const PropertyPanel = {
                 return this.generateSwitchProperties(node);
             case 'SliderNode':
                 return this.generateSliderProperties(node);
+            case 'FFTNode':
+                return this.generateFFTProperties(node);
             default:
                 return '<div class="property"><p>No specific properties available for this node type.</p></div>';
         }
@@ -321,6 +323,9 @@ const PropertyPanel = {
                 break;
             case 'SliderNode':
                 this.updateSliderProperties(node);
+                break;
+            case 'FFTNode':
+                this.updateFFTProperties(node);
                 break;
         }
         
@@ -858,6 +863,89 @@ const PropertyPanel = {
             node.properties.defaultValue = parseFloat(defaultValueField.value);
             if (node.onPropertyChanged) {
                 node.onPropertyChanged('defaultValue', parseFloat(defaultValueField.value));
+            }
+        }
+    },
+    
+    // FFT node properties
+    generateFFTProperties(node) {
+        return `
+            <div class="property">
+                <label>FFT Size:</label>
+                <select id="prop-fftSize">
+                    <option value="64" ${node.properties.fftSize === 64 ? "selected" : ""}>64</option>
+                    <option value="128" ${node.properties.fftSize === 128 ? "selected" : ""}>128</option>
+                    <option value="256" ${node.properties.fftSize === 256 ? "selected" : ""}>256</option>
+                    <option value="512" ${node.properties.fftSize === 512 ? "selected" : ""}>512</option>
+                    <option value="1024" ${node.properties.fftSize === 1024 ? "selected" : ""}>1024</option>
+                    <option value="2048" ${node.properties.fftSize === 2048 ? "selected" : ""}>2048</option>
+                </select>
+            </div>
+            <div class="property">
+                <label>Window Type:</label>
+                <select id="prop-windowType">
+                    <option value="rectangular" ${node.properties.windowType === "rectangular" ? "selected" : ""}>Rectangular</option>
+                    <option value="hann" ${node.properties.windowType === "hann" ? "selected" : ""}>Hann</option>
+                    <option value="hamming" ${node.properties.windowType === "hamming" ? "selected" : ""}>Hamming</option>
+                    <option value="blackman" ${node.properties.windowType === "blackman" ? "selected" : ""}>Blackman</option>
+                </select>
+            </div>
+            <div class="property">
+                <label>Sample Rate (Hz):</label>
+                <input type="number" id="prop-sampleRate" value="${node.properties.sampleRate}" min="1" max="1000">
+                <small>Rate at which input samples are collected</small>
+            </div>
+            <div class="property">
+                <label>Overlap:</label>
+                <input type="number" id="prop-overlap" value="${node.properties.overlap}" min="0" max="0.9" step="0.1">
+                <small>Overlap between successive FFT windows (0-0.9)</small>
+            </div>
+            <div class="property">
+                <label>Output Mode:</label>
+                <select id="prop-outputMode">
+                    <option value="peak" ${node.properties.outputMode === "peak" ? "selected" : ""}>Peak Detection</option>
+                    <option value="spectrum" ${node.properties.outputMode === "spectrum" ? "selected" : ""}>Full Spectrum</option>
+                </select>
+            </div>
+        `;
+    },
+    
+    // Update FFT properties
+    updateFFTProperties(node) {
+        const fftSizeField = document.getElementById("prop-fftSize");
+        const windowTypeField = document.getElementById("prop-windowType");
+        const sampleRateField = document.getElementById("prop-sampleRate");
+        const overlapField = document.getElementById("prop-overlap");
+        const outputModeField = document.getElementById("prop-outputMode");
+        
+        if (fftSizeField) {
+            node.properties.fftSize = parseInt(fftSizeField.value);
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('fftSize', parseInt(fftSizeField.value));
+            }
+        }
+        if (windowTypeField) {
+            node.properties.windowType = windowTypeField.value;
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('windowType', windowTypeField.value);
+            }
+        }
+        if (sampleRateField) {
+            node.properties.sampleRate = parseFloat(sampleRateField.value);
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('sampleRate', parseFloat(sampleRateField.value));
+            }
+        }
+        if (overlapField) {
+            node.properties.overlap = parseFloat(overlapField.value);
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('overlap', parseFloat(overlapField.value));
+            }
+        }
+        if (outputModeField) {
+            node.properties.outputMode = outputModeField.value;
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('outputMode', outputModeField.value);
             }
         }
     },

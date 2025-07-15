@@ -36,6 +36,7 @@ const NodeRegistry = {
         if (window.FilterNode) this.register(FilterNode, "trendows/filter");
         if (window.StatisticsNode) this.register(StatisticsNode, "trendows/statistics");
         if (window.FormulaNode) this.register(FormulaNode, "trendows/formula");
+        if (window.FFTNode) this.register(FFTNode, "trendows/fft");
         
         // Visualization
         if (window.GaugeNode) this.register(GaugeNode, "trendows/gauge");
