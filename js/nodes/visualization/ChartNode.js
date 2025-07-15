@@ -17,7 +17,7 @@ class ChartNode extends BaseNode {
         this.size = [200, 120];
         this.color = "#9B59B6";
         this.dataHistory = [[], [], []]; // Three traces
-        this.maxDataPoints = 300;
+        this.maxDataPoints = 3000; // Enough for 300 seconds at 100ms intervals
     }
     
     getMenuOptions() {
@@ -57,7 +57,6 @@ class ChartNode extends BaseNode {
         if (!simulationRunning) return;
         
         const currentTime = Date.now();
-        const timeWindow = this.properties.timeWindow * 1000; // Convert to ms
         
         // Collect current values and add to history
         for (let i = 0; i < this.inputs.length; i++) {
@@ -65,12 +64,7 @@ class ChartNode extends BaseNode {
             if (value !== undefined) {
                 this.dataHistory[i].push({ time: currentTime, value: value });
                 
-                // Remove old data points
-                this.dataHistory[i] = this.dataHistory[i].filter(point => 
-                    currentTime - point.time <= timeWindow
-                );
-                
-                // Limit total points
+                // Only limit total points (don't filter by time here)
                 if (this.dataHistory[i].length > this.maxDataPoints) {
                     this.dataHistory[i] = this.dataHistory[i].slice(-this.maxDataPoints);
                 }
@@ -143,15 +137,29 @@ class ChartNode extends BaseNode {
         const timeWindow = this.properties.timeWindow * 1000;
         
         this.dataHistory.forEach((trace, index) => {
-            if (trace.length < 2 || index >= colors.length) return;
+            if (trace.length < 1 || index >= colors.length) return;
+            
+            // Filter trace to only include points within the time window
+            const visibleTrace = trace.filter(point => 
+                currentTime - point.time <= timeWindow
+            );
+            
+            if (visibleTrace.length < 1) return;
+            
+            // Always use the full time window for consistent scaling
+            const chartStartTime = currentTime - timeWindow;
+            const chartEndTime = currentTime;
             
             ctx.strokeStyle = colors[index];
             ctx.lineWidth = 2;
             ctx.beginPath();
             
             let firstPoint = true;
-            trace.forEach(point => {
-                const x = chartX + chartW * (1 - (currentTime - point.time) / timeWindow);
+            visibleTrace.forEach(point => {
+                // Map point time to chart position using full time window
+                const timeFromStart = point.time - chartStartTime;
+                const timeProgress = timeFromStart / timeWindow;
+                const x = chartX + chartW * timeProgress;
                 const y = chartY + chartH * (1 - (point.value - minY) / (maxY - minY));
                 
                 if (firstPoint) {
@@ -164,12 +172,26 @@ class ChartNode extends BaseNode {
             ctx.stroke();
         });
         
-        // Draw axis labels
+        // Draw axis labels and debug info
         ctx.fillStyle = "#ECF0F1";
         ctx.font = "10px Arial";
         ctx.textAlign = "left";
         ctx.fillText(minY.toFixed(1), chartX + 2, chartY + chartH - 2);
         ctx.fillText(maxY.toFixed(1), chartX + 2, chartY + 12);
+        
+        // Debug: Show time window info
+        ctx.fillStyle = "#BDC3C7";
+        ctx.font = "8px Arial";
+        ctx.fillText(`${this.properties.timeWindow}s window`, chartX + 2, chartY + chartH + 12);
+        
+        // Show actual data span if there's data
+        if (this.dataHistory[0] && this.dataHistory[0].length > 0) {
+            const oldestPoint = this.dataHistory[0].reduce((oldest, point) => 
+                point.time < oldest.time ? point : oldest
+            );
+            const actualSpan = ((currentTime - oldestPoint.time) / 1000).toFixed(1);
+            ctx.fillText(`${actualSpan}s data`, chartX + 2, chartY + chartH + 22);
+        }
     }
 }
 
