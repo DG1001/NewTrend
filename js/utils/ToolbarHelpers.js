@@ -20,7 +20,7 @@ const ToolbarHelpers = {
         graph.add(node);
         
         // Show properties automatically
-        graph.selectNode(node);
+        canvas.selectNode(node);
         if (window.showNodeProperties) {
             showNodeProperties(node);
         }
