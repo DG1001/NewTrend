@@ -963,9 +963,14 @@ const PropertyPanel = {
                 <input type="text" id="prop-brokerIP" value="${node.properties.brokerIP}" placeholder="localhost">
             </div>
             <div class="property">
-                <label>Broker Port:</label>
+                <label>MQTT Port:</label>
                 <input type="number" id="prop-brokerPort" value="${node.properties.brokerPort}" min="1" max="65535">
-                <small>WebSocket port (usually MQTT port + 1)</small>
+                <small>Standard MQTT port (usually 1883)</small>
+            </div>
+            <div class="property">
+                <label>WebSocket Port:</label>
+                <input type="number" id="prop-wsPort" value="${node.properties.wsPort}" min="1" max="65535">
+                <small>MQTT WebSocket port (e.g., 1884, 9001, 8083)</small>
             </div>
             <div class="property">
                 <label>Topic:</label>
@@ -991,6 +996,7 @@ const PropertyPanel = {
     updateMQTTProperties(node) {
         const brokerIPField = document.getElementById("prop-brokerIP");
         const brokerPortField = document.getElementById("prop-brokerPort");
+        const wsPortField = document.getElementById("prop-wsPort");
         const topicField = document.getElementById("prop-topic");
         
         if (brokerIPField) {
@@ -1003,6 +1009,12 @@ const PropertyPanel = {
             node.properties.brokerPort = parseInt(brokerPortField.value);
             if (node.onPropertyChanged) {
                 node.onPropertyChanged('brokerPort', parseInt(brokerPortField.value));
+            }
+        }
+        if (wsPortField) {
+            node.properties.wsPort = parseInt(wsPortField.value);
+            if (node.onPropertyChanged) {
+                node.onPropertyChanged('wsPort', parseInt(wsPortField.value));
             }
         }
         if (topicField) {

@@ -7,6 +7,7 @@ class MQTTNode extends BaseNode {
         this.properties = {
             brokerIP: 'localhost',
             brokerPort: 1883,
+            wsPort: 1884,
             topic: 'sensors/temperature',
             name: 'MQTT 1'
         };
@@ -68,8 +69,8 @@ class MQTTNode extends BaseNode {
         this.lastMessage = 'Connecting...';
         
         try {
-            // Create MQTT client
-            const brokerUrl = `ws://${this.properties.brokerIP}:${this.properties.brokerPort + 1}`;
+            // Create MQTT client using dedicated WebSocket port
+            const brokerUrl = `ws://${this.properties.brokerIP}:${this.properties.wsPort}`;
             this.client = mqtt.connect(brokerUrl, {
                 clientId: `trendows_${Math.random().toString(16).substr(2, 8)}`,
                 clean: true,
@@ -151,10 +152,13 @@ class MQTTNode extends BaseNode {
     onPropertyChanged(name, value) {
         if (name === 'brokerIP') {
             this.properties.brokerIP = value;
-            this.reconnectIfConnected();
+            this.reconnectWithNewSettings();
         } else if (name === 'brokerPort') {
             this.properties.brokerPort = parseInt(value);
-            this.reconnectIfConnected();
+            this.reconnectWithNewSettings();
+        } else if (name === 'wsPort') {
+            this.properties.wsPort = parseInt(value);
+            this.reconnectWithNewSettings();
         } else if (name === 'topic') {
             // Unsubscribe from old topic
             if (this.client && this.connected) {
@@ -180,6 +184,15 @@ class MQTTNode extends BaseNode {
                 this.connectToMQTT();
             }, 1000);
         }
+    }
+    
+    reconnectWithNewSettings() {
+        // Always try to reconnect with new settings, regardless of current state
+        this.disconnect();
+        setTimeout(() => {
+            this.connectionAttempts = 0;
+            this.connectToMQTT();
+        }, 1000);
     }
     
     onDrawForeground(ctx) {
